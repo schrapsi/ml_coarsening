@@ -73,9 +73,9 @@ class MLCoarseningModule(LightningModule):
         self.train_mse(predictions, targets)
         self.train_r2(predictions, targets)
 
-        self.log("train/loss", self.train_loss, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("train/loss", self.train_loss, on_step=False, on_epoch=True, prog_bar=False)
         self.log("train/mse", self.train_mse, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("train/r2", self.train_r2, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("train/r2", self.train_r2, on_step=False, on_epoch=True, prog_bar=False)
 
         return loss
 
@@ -87,9 +87,9 @@ class MLCoarseningModule(LightningModule):
         self.val_mse(predictions, targets)
         self.val_r2(predictions, targets)
 
-        self.log("val/loss", self.val_loss, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val/loss", self.val_loss, on_step=False, on_epoch=True, prog_bar=False)
         self.log("val/mse", self.val_mse, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("val/r2", self.val_r2, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val/r2", self.val_r2, on_step=False, on_epoch=True, prog_bar=False)
 
     def on_validation_epoch_end(self) -> None:
         mse = self.val_mse.compute()  # Get current val MSE
@@ -104,9 +104,9 @@ class MLCoarseningModule(LightningModule):
         self.test_mse(predictions, targets)
         self.test_r2(predictions, targets)
 
-        self.log("test/loss", self.test_loss, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("test/loss", self.test_loss, on_step=False, on_epoch=True, prog_bar=False)
         self.log("test/mse", self.test_mse, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("test/r2", self.test_r2, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("test/r2", self.test_r2, on_step=False, on_epoch=True, prog_bar=False)
 
     def setup(self, stage: str) -> None:
         if self.hparams.compile and stage == "fit":
