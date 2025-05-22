@@ -15,7 +15,7 @@ class MLCoarseningModule(LightningModule):
             compile: bool = False,
     ) -> None:
         super().__init__()
-        self.save_hyperparameters(logger=False)
+        self.save_hyperparameters(logger=False, ignore=["net"])
         self.net = net
 
         # Loss function
