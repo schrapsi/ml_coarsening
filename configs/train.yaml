@@ -7,6 +7,7 @@ defaults:
   - trainer: default
   - paths: default
 
+train: True
 # Training-specific parameters
 seed: 42
 
