@@ -14,12 +14,12 @@ class GraphDataModule(LightningDataModule):
     def __init__(
             self,
             data_dir: str,
-            data_amount: int = None,
-            graphs_file: str = None,
             features_file: str = None,
+            graphs_file: str = None,
             batch_size: int = 32,
             num_workers: int = 0,
-            train_val_test_split: list[float] = [0.7, 0.15, 0.15]
+            train_val_test_split: list[float] = [0.7, 0.15, 0.15],
+            data_amount: int = None,
     ):
         super().__init__()
         self.data_dir = data_dir
