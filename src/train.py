@@ -1,7 +1,8 @@
 from typing import Optional, Tuple, Dict, Any, List
 import hydra
 from omegaconf import DictConfig
-from lightning import LightningDataModule, LightningModule, Trainer, Callback
+from lightning import LightningDataModule, LightningModule, Trainer, Callback,
+from lightning.pytorch.loggers import Logger
 
 
 def instantiate_callbacks(callbacks_cfg: DictConfig) -> List[Callback]:
@@ -32,7 +33,7 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
 
     callbacks: List[Callback] = instantiate_callbacks(cfg.get("callbacks"))
 
-    logger = hydra.utils.instantiate(cfg.get("logger"))
+    logger: Logger = hydra.utils.instantiate(cfg.logger)
 
     trainer: Trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
     object_dict = {
