@@ -12,7 +12,7 @@ def instantiate_callbacks(callbacks_cfg: DictConfig) -> List[Callback]:
         return callbacks
 
     if not isinstance(callbacks_cfg, DictConfig):
-        raise TypeError("Callbacks config must be a DictConfig!")
+        raise TypeError("Callbacks configs must be a DictConfig!")
 
     for _, cb_conf in callbacks_cfg.items():
         if isinstance(cb_conf, DictConfig) and "_target_" in cb_conf:

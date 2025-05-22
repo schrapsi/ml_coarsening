@@ -1,5 +1,3 @@
-
-
 defaults:
   - _self_
   - data: graph_datamodule/default  # Fixed the path format
