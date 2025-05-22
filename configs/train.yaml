@@ -8,6 +8,7 @@ defaults:
   - paths: default
 
 train: True
+ckpt_path: null
 # Training-specific parameters
 seed: 42
 
