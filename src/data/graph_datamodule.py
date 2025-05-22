@@ -53,7 +53,7 @@ class GraphDataModule(LightningDataModule):
         combined = pd.DataFrame()
 
         for graph in self.graphs:
-            graph_path = str(Path(self.data_dir) / graph / "/")
+            graph_path = str(Path(self.data_dir) / graph / "") + "/"
             fm = feature_matrix_n_performance(graph_path, self.data_amount)
 
             # Select only specified features if provided
