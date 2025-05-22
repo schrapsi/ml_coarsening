@@ -119,3 +119,7 @@ class GraphDataModule(LightningDataModule):
             return len(self.features)
         else:
             raise ValueError("Features not specified or not found in the dataset.")
+
+if __name__ == "__main__":
+    # Example usage
+    _ = GraphDataModule(None, None, None, None)
