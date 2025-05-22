@@ -112,3 +112,10 @@ class GraphDataModule(LightningDataModule):
             shuffle=False,
             num_workers=self.num_workers
         )
+
+    def get_feature_count(self):
+        # Return the number of features
+        if self.features:
+            return len(self.features)
+        else:
+            raise ValueError("Features not specified or not found in the dataset.")
