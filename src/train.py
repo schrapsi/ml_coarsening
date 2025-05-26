@@ -1,8 +1,11 @@
+import os
 from typing import Optional, Tuple, Dict, Any, List
 import hydra
 from omegaconf import DictConfig
 from lightning import LightningDataModule, LightningModule, Trainer, Callback
 from lightning.pytorch.loggers import Logger
+from hydra.utils import to_absolute_path
+import joblib
 
 
 def instantiate_callbacks(callbacks_cfg: DictConfig) -> List[Callback]:
@@ -25,6 +28,8 @@ def instantiate_callbacks(callbacks_cfg: DictConfig) -> List[Callback]:
 
 def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     #log.info(f"Instantiating datamodule <{cfg.data._target_}>")
+    print("Printing cfg.data:")
+    print(cfg.data)
     datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data)
 
     cfg.model.net.input_size = datamodule.get_feature_count()
@@ -33,7 +38,9 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
 
     callbacks: List[Callback] = instantiate_callbacks(cfg.get("callbacks"))
 
-    logger: Logger = hydra.utils.instantiate(cfg.logger.mlflow)
+    logger = None
+    if not cfg.get("logger") is None:
+        logger: Logger = hydra.utils.instantiate(cfg.logger.mlflow) or None
 
     trainer: Trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
     object_dict = {
@@ -46,6 +53,11 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         #log.info("Starting training!")
         trainer.fit(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
     train_metrics = trainer.callback_metrics
+
+    out_dir = to_absolute_path(cfg.paths.output_dir)
+    os.makedirs(out_dir, exist_ok=True)
+    scaler_path = os.path.join(out_dir, "scaler.joblib")
+    joblib.dump(datamodule.scaler, scaler_path)
 
     return {}, {}
 

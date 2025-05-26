@@ -6,6 +6,7 @@ from lightning import LightningDataModule
 from src.utils.data_import import feature_matrix_n_performance
 
 from torch.utils.data import TensorDataset, DataLoader
+from sklearn.model_selection import train_test_split
 
 import torch
 
@@ -20,12 +21,14 @@ class GraphDataModule(LightningDataModule):
             num_workers: int = 0,
             train_val_test_split: list[float] = [0.7, 0.15, 0.15],
             data_amount: int = None,
+            scaler = None,
     ):
         super().__init__()
         self.data_dir = data_dir
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.split = train_val_test_split
+        self.scaler = scaler
 
         if graphs_file and Path(graphs_file).exists():
             with open(graphs_file, 'r') as f:
@@ -65,26 +68,48 @@ class GraphDataModule(LightningDataModule):
 
             combined = pd.concat([combined, fm], axis=0, ignore_index=True)
 
-        # Split the data
-        X = combined.drop('frequency', axis=1)
-        y = combined['frequency']
+            # 2. Split into train, val, test DataFrames
+            train_frac, val_frac, test_frac = self.split
+            assert abs(train_frac + val_frac + test_frac - 1.0) < 1e-6, "Splits must sum to 1."
 
-        # Convert to tensors
-        X_tensor = torch.tensor(X.values, dtype=torch.float32)
-        y_tensor = torch.tensor(y.values, dtype=torch.float32).unsqueeze(1)
+            train_df, temp_df = train_test_split(
+                combined,
+                test_size=(val_frac + test_frac),
+                random_state=42
+            )
+            val_df, test_df = train_test_split(
+                temp_df,
+                test_size=test_frac / (val_frac + test_frac),
+                random_state=42
+            )
 
-        # Create datasets for training, validation, and testing
-        dataset = TensorDataset(X_tensor, y_tensor)
+            # 3. Separate features and target
+            X_train = train_df.drop('frequency', axis=1)
+            y_train = train_df['frequency']
+            X_val = val_df.drop('frequency', axis=1)
+            y_val = val_df['frequency']
+            X_test = test_df.drop('frequency', axis=1)
+            y_test = test_df['frequency']
 
-        # Calculate split sizes
-        train_size = int(len(dataset) * self.split[0])
-        val_size = int(len(dataset) * self.split[1])
-        test_size = len(dataset) - train_size - val_size
+            # 4. Fit scaler on train and transform all splits
+            self.scaler.fit(X_train)
+            X_train_scaled = self.scaler.transform(X_train)
+            X_val_scaled = self.scaler.transform(X_val)
+            X_test_scaled = self.scaler.transform(X_test)
 
-        # Split dataset
-        self.train_dataset, self.val_dataset, self.test_dataset = torch.utils.data.random_split(
-            dataset, [train_size, val_size, test_size]
-        )
+            # 5. Convert to tensors and wrap into datasets
+            self.train_dataset = TensorDataset(
+                torch.tensor(X_train_scaled, dtype=torch.float32),
+                torch.tensor(y_train.values, dtype=torch.float32).unsqueeze(1)
+            )
+            self.val_dataset = TensorDataset(
+                torch.tensor(X_val_scaled, dtype=torch.float32),
+                torch.tensor(y_val.values, dtype=torch.float32).unsqueeze(1)
+            )
+            self.test_dataset = TensorDataset(
+                torch.tensor(X_test_scaled, dtype=torch.float32),
+                torch.tensor(y_test.values, dtype=torch.float32).unsqueeze(1)
+            )
 
     def train_dataloader(self):
         # Return the train dataloader

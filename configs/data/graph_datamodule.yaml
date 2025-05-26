@@ -6,3 +6,7 @@ batch_size: 64
 num_workers: 4
 train_val_test_split: [0.7, 0.15, 0.15]
 data_amount: 100000
+scaler:
+  _target_: sklearn.preprocessing.StandardScaler
+  with_mean: True
+  with_std: True
