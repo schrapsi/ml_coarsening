@@ -9,6 +9,7 @@ defaults:
   - debug: null
 
 train: True
+task_name: "train"
 ckpt_path: null
 # Training-specific parameters
 seed: 42

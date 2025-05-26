@@ -33,6 +33,7 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data)
 
     cfg.model.net.input_size = datamodule.get_feature_count()
+    cfg.model.scaler = datamodule.scaler
 
     model: LightningModule = hydra.utils.instantiate(cfg.model)
 
@@ -53,11 +54,6 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         #log.info("Starting training!")
         trainer.fit(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
     train_metrics = trainer.callback_metrics
-
-    out_dir = to_absolute_path(cfg.paths.output_dir)
-    os.makedirs(out_dir, exist_ok=True)
-    scaler_path = os.path.join(out_dir, "scaler.joblib")
-    joblib.dump(datamodule.scaler, scaler_path)
 
     return {}, {}
 

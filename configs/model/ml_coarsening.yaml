@@ -17,7 +17,11 @@ net:
   _target_: src.models.components.customizable_dense_net.CustomizableDenseNet
   input_size: 208
   hidden_sizes:
-    - 1000
-    - 1000
+    - 512
+    - 256
+    - 128
+    - 64
   output_size: 1
   dropout: 0.5
+
+scaler: None

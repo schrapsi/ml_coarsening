@@ -12,7 +12,9 @@ class MLCoarseningModule(LightningModule):
             net: torch.nn.Module,
             optimizer: torch.optim.Optimizer,
             scheduler: torch.optim.lr_scheduler,
+            scaler = None,
             compile: bool = False,
+
     ) -> None:
         super().__init__()
         self.save_hyperparameters(logger=False, ignore=["net"])
