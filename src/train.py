@@ -28,8 +28,6 @@ def instantiate_callbacks(callbacks_cfg: DictConfig) -> List[Callback]:
 
 def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     #log.info(f"Instantiating datamodule <{cfg.data._target_}>")
-    print("Printing cfg.data:")
-    print(cfg.data)
     datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data)
 
     cfg.model.net.input_size = datamodule.get_feature_count()
@@ -44,6 +42,7 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         logger: Logger = hydra.utils.instantiate(cfg.logger.mlflow) or None
 
     trainer: Trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
+
     object_dict = {
         "cfg": cfg,
         "datamodule": datamodule,
@@ -53,9 +52,24 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     if cfg.get("train"):
         #log.info("Starting training!")
         trainer.fit(model=model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"))
+
     train_metrics = trainer.callback_metrics
 
-    return {}, {}
+    if cfg.get("test"):
+        #log.info("Starting testing!")
+        ckpt_path = trainer.checkpoint_callback.best_model_path
+        if ckpt_path == "":
+            #log.warning("Best ckpt not found! Using current weights for testing...")
+            ckpt_path = None
+        trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
+        #log.info(f"Best ckpt path: {ckpt_path}")
+
+    test_metrics = trainer.callback_metrics
+
+    # merge train and test metrics
+    metric_dict = {**train_metrics, **test_metrics}
+
+    return metric_dict, object_dict
 
 
 @hydra.main(version_base="1.3", config_path="../configs", config_name="train.yaml")

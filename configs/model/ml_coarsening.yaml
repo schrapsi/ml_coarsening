@@ -23,5 +23,6 @@ net:
     - 64
   output_size: 1
   dropout: 0.5
-
+  with_sigmoid: true
+  with_batch_norm: true
 scaler: None
