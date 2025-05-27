@@ -5,6 +5,75 @@ import pandas as pd
 from pandas import DataFrame
 
 
+def feature_matrix_n(path, amount=None, with_id=False, balanced=False) -> DataFrame:
+    print("Starting to Parse: ", path)
+    global_f = pd.read_csv(path + "global.csv")
+    if amount is None:
+        edges = pd.read_csv(path + "edges_shuf.csv")
+    else:
+        edges = pd.read_csv(path + "edges_shuf.csv", nrows=int(amount))
+
+    nodes = pd.read_csv(path + "nodes.csv")
+    if balanced:
+        labels = pd.read_csv(path + "freq_balanced.csv", comment='#')
+    else:
+        labels = pd.read_csv(path + "freq_all.csv", comment='#')
+
+    row = global_f.iloc[0]
+    replicated_global_f = pd.concat([row.to_frame().T] * len(edges), ignore_index=True)
+    node1_features = pd.merge(edges[['id_high_degree']], nodes, left_on='id_high_degree', right_on='node_id',
+                              how='left')
+    node2_features = pd.merge(edges[['id_low_degree']], nodes, left_on='id_low_degree', right_on='node_id',
+                              how='left')
+
+    node1_features = node1_features.drop(columns=['id_high_degree', 'node_id'])
+    node2_features = node2_features.drop(columns=['id_low_degree', 'node_id'])
+
+    combined_features = pd.concat([replicated_global_f, edges, node1_features, node2_features], axis=1)
+
+    max_row = pd.read_csv(path + "freq_all.csv", low_memory=False, nrows=2)
+    max_row = max_row.iloc[0, 0]
+    max_value = int(re.search(r"# max=(\d+)", max_row).group(1))
+
+    labels['id_high_degree'] = labels['id_high_degree'].astype(int)
+    labels['id_low_degree'] = labels['id_low_degree'].astype(int)
+
+    merged_df = pd.merge(combined_features[['id_high_degree', 'id_low_degree']], labels,
+                         on=['id_high_degree', 'id_low_degree'], how='left')
+
+    sorted_labels = merged_df['frequency']
+    if with_id:
+        combined_features = pd.concat([combined_features[['id_high_degree', 'id_low_degree']],
+                                       combined_features.drop(columns=['id_high_degree', 'id_low_degree'])], axis=1)
+    else:
+        combined_features = combined_features.drop(columns=['id_high_degree', 'id_low_degree'])
+
+    sorted_labels = sorted_labels / max_value
+
+    na_series = combined_features.isna().sum()
+    na_list = na_series.tolist()
+
+    last_folder = Path(path).parts[-1]
+    if sum(na_list) > 0:
+        print(f"Missing values in {last_folder}")
+
+    combined_features.fillna(1, inplace=True)
+
+    fm = pd.concat([combined_features, sorted_labels], axis=1)
+    cols = pd.Series(fm.columns)
+    for duplicate in fm.columns[fm.columns.duplicated(keep=False)].unique():
+        names = []
+        for n in range(sum(fm.columns == duplicate)):
+            if n == 0:
+                names.append(f'{duplicate}')
+            else:
+                names.append(f'{duplicate}.{n}')
+        cols[fm.columns == duplicate] = names
+    fm.columns = cols
+
+    return fm
+
+
 def feature_matrix_n_performance(path, amount=None, with_id=False, balanced=False) -> DataFrame:
     print("Starting to Parse: ", path)
 
