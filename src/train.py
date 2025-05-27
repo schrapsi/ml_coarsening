@@ -33,9 +33,9 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data)
 
     cfg.model.net.input_size = datamodule.get_feature_count()
-    cfg.model.scaler = datamodule.scaler
 
     model: LightningModule = hydra.utils.instantiate(cfg.model)
+    model.hparams.scaler = datamodule.scaler
 
     callbacks: List[Callback] = instantiate_callbacks(cfg.get("callbacks"))
 
