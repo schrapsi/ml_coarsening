@@ -13,7 +13,7 @@ model_checkpoint:
 
 early_stopping:
   monitor: "val/mse"
-  patience: 100
+  patience: 10
   mode: "min"
 
 model_summary:
