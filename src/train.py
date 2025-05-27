@@ -8,8 +8,8 @@ from lightning.pytorch.loggers import Logger
 from hydra.utils import to_absolute_path
 import joblib
 
-from utils.logging_utils import log_hyperparameters
-from utils.pylogger import RankedLogger
+from src.utils.logging_utils import log_hyperparameters
+from src.utils.pylogger import RankedLogger
 
 torch.set_float32_matmul_precision('medium')
 log = RankedLogger(__name__, rank_zero_only=True)
