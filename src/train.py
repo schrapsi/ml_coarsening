@@ -1,11 +1,14 @@
 import os
 from typing import Optional, Tuple, Dict, Any, List
 import hydra
+import torch
 from omegaconf import DictConfig
 from lightning import LightningDataModule, LightningModule, Trainer, Callback
 from lightning.pytorch.loggers import Logger
 from hydra.utils import to_absolute_path
 import joblib
+
+torch.set_float32_matmul_precision('medium')
 
 
 def instantiate_callbacks(callbacks_cfg: DictConfig) -> List[Callback]:
@@ -40,6 +43,7 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     logger = None
     if not cfg.get("logger") is None:
         logger: Logger = hydra.utils.instantiate(cfg.logger.mlflow) or None
+
 
     trainer: Trainer = hydra.utils.instantiate(cfg.trainer, callbacks=callbacks, logger=logger)
 
