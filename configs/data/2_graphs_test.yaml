@@ -1,0 +1,5 @@
+defaults:
+  - graph_datamodule
+
+graphs_file: ${paths.root_dir}/configs/data/graphs/test_set.txt
+data_amount: 10000
