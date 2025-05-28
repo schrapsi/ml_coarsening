@@ -50,7 +50,6 @@ class GraphDataModule(LightningDataModule):
             full_path = Path(self.data_dir) / graph
             if not full_path.exists():
                 raise FileNotFoundError(f"Graph directory {full_path} not found")
-        pass
 
     def setup(self, stage=None):
         combined = pd.DataFrame()
