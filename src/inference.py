@@ -5,7 +5,7 @@ from typing import Optional, Tuple, Dict, Any
 
 import torch
 import hydra
-from models.ml_coarsening_module import MLCoarseningModule
+from src.models.ml_coarsening_module import MLCoarseningModule
 from lightning import LightningDataModule
 from omegaconf import DictConfig
 from lightning.pytorch import Trainer
