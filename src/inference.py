@@ -12,7 +12,7 @@ from lightning.pytorch import Trainer
 
 
 def inference(cfg: DictConfig):
-    model = MLCoarseningModule.load_from_checkpoint(cfg.ckpt_path)
+    model = MLCoarseningModule.load_from_checkpoint(cfg.ckpt_path, map_location=torch.device("cpu"))
 
     ckpt_path = Path(cfg.ckpt_path)
     run_dir = ckpt_path.parent.parent
