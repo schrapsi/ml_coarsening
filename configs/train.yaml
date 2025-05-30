@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - data: graph_datamodule  # Fixed the path format
+  - data: train_default  # Fixed the path format
   - model: ml_coarsening
   - callbacks: default
   - logger: mlflow  # For experiment tracking

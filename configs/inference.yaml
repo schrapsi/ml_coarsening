@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - data: prediction_datamodule  # Fixed the path format
+  - data: pred_default  # Fixed the path format
   - trainer: default
   - paths: default
   - debug: null
