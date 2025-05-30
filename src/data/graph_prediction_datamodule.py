@@ -4,7 +4,7 @@ import torch
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import TensorDataset
 
-from utils.data_import import feature_matrix_n_performance
+from src.utils.data_import import feature_matrix_n_performance
 from torch.utils.data import DataLoader
 
 
