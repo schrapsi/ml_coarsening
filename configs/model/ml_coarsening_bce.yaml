@@ -15,6 +15,7 @@ scheduler:
 
 net:
   _target_: src.models.components.customizable_dense_net.CustomizableDenseNet
+  input_size: 208
   hidden_sizes:
     - 512
     - 256
