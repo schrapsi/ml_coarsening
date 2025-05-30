@@ -95,12 +95,6 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
 
     train_metrics = trainer.callback_metrics
 
-    early_stopping_callback = callbacks[1]
-    if early_stopping_callback.stopped_epoch != -1:  # -1 is the default value when not stopped
-        log.info(f"Early stopping triggered at epoch {early_stopping_callback.stopped_epoch}")
-    else:
-        log.info("Training completed without early stopping")
-
     if cfg.get("test"):
         log.info("Starting testing!")
         ckpt_path = trainer.checkpoint_callback.best_model_path

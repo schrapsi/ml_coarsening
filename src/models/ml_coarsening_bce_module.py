@@ -4,13 +4,7 @@ import hydra
 import torch
 from lightning import LightningModule
 import torchmetrics as tm
-from torchmetrics.classification import (
-    BinaryAccuracy,
-    BinaryPrecision,
-    BinaryRecall,
-    BinaryF1Score,
-    BinaryAUROC,
-)
+from torchmetrics.regression import MeanSquaredError, R2Score, MeanAbsoluteError
 
 
 class MLCoarseningBCEModule(LightningModule):
@@ -30,32 +24,26 @@ class MLCoarseningBCEModule(LightningModule):
         # BCE with Logits Loss
         self.criterion = torch.nn.BCEWithLogitsLoss()
 
-        # Train metrics
+        # Train metrics - using regression metrics for continuous targets
         self.train_loss = tm.MeanMetric()
-        self.train_acc = BinaryAccuracy()
-        self.train_precision = BinaryPrecision()
-        self.train_recall = BinaryRecall()
-        self.train_f1 = BinaryF1Score()
-        self.train_auroc = BinaryAUROC()
+        self.train_mse = MeanSquaredError()
+        self.train_mae = MeanAbsoluteError()
+        self.train_r2 = R2Score()
 
         # Validation metrics
         self.val_loss = tm.MeanMetric()
-        self.val_acc = BinaryAccuracy()
-        self.val_precision = BinaryPrecision()
-        self.val_recall = BinaryRecall()
-        self.val_f1 = BinaryF1Score()
-        self.val_auroc = BinaryAUROC()
+        self.val_mse = MeanSquaredError()
+        self.val_mae = MeanAbsoluteError()
+        self.val_r2 = R2Score()
 
         # Test metrics
         self.test_loss = tm.MeanMetric()
-        self.test_acc = BinaryAccuracy()
-        self.test_precision = BinaryPrecision()
-        self.test_recall = BinaryRecall()
-        self.test_f1 = BinaryF1Score()
-        self.test_auroc = BinaryAUROC()
+        self.test_mse = MeanSquaredError()
+        self.test_mae = MeanAbsoluteError()
+        self.test_r2 = R2Score()
 
         # Best metric tracking
-        self.val_f1_best = tm.MaxMetric()
+        self.val_mse_best = tm.MinMetric()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # Raw logits output from network
@@ -68,20 +56,16 @@ class MLCoarseningBCEModule(LightningModule):
     def on_train_start(self) -> None:
         # Reset metrics at start of training
         self.train_loss.reset()
-        self.train_acc.reset()
-        self.train_precision.reset()
-        self.train_recall.reset()
-        self.train_f1.reset()
-        self.train_auroc.reset()
+        self.train_mse.reset()
+        self.train_mae.reset()
+        self.train_r2.reset()
 
         self.val_loss.reset()
-        self.val_acc.reset()
-        self.val_precision.reset()
-        self.val_recall.reset()
-        self.val_f1.reset()
-        self.val_auroc.reset()
+        self.val_mse.reset()
+        self.val_mae.reset()
+        self.val_r2.reset()
 
-        self.val_f1_best.reset()
+        self.val_mse_best.reset()
 
     def model_step(
             self, batch: Tuple[torch.Tensor, torch.Tensor]
@@ -101,18 +85,14 @@ class MLCoarseningBCEModule(LightningModule):
 
         # Update and log metrics
         self.train_loss(loss)
-        self.train_acc(predictions, targets)
-        self.train_precision(predictions, targets)
-        self.train_recall(predictions, targets)
-        self.train_f1(predictions, targets)
-        self.train_auroc(predictions, targets)
+        self.train_mse(predictions, targets)
+        self.train_mae(predictions, targets)
+        self.train_r2(predictions, targets)
 
         self.log("train/loss", self.train_loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log("train/acc", self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("train/precision", self.train_precision, on_step=False, on_epoch=True)
-        self.log("train/recall", self.train_recall, on_step=False, on_epoch=True)
-        self.log("train/f1", self.train_f1, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("train/auroc", self.train_auroc, on_step=False, on_epoch=True)
+        self.log("train/mse", self.train_mse, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("train/mae", self.train_mae, on_step=False, on_epoch=True, prog_bar=False)
+        self.log("train/r2", self.train_r2, on_step=False, on_epoch=True, prog_bar=False)
 
         return loss
 
@@ -121,41 +101,33 @@ class MLCoarseningBCEModule(LightningModule):
 
         # Update and log metrics
         self.val_loss(loss)
-        self.val_acc(predictions, targets)
-        self.val_precision(predictions, targets)
-        self.val_recall(predictions, targets)
-        self.val_f1(predictions, targets)
-        self.val_auroc(predictions, targets)
+        self.val_mse(predictions, targets)
+        self.val_mae(predictions, targets)
+        self.val_r2(predictions, targets)
 
         self.log("val/loss", self.val_loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log("val/acc", self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("val/precision", self.val_precision, on_step=False, on_epoch=True)
-        self.log("val/recall", self.val_recall, on_step=False, on_epoch=True)
-        self.log("val/f1", self.val_f1, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("val/auroc", self.val_auroc, on_step=False, on_epoch=True)
+        self.log("val/mse", self.val_mse, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val/mae", self.val_mae, on_step=False, on_epoch=True, prog_bar=False)
+        self.log("val/r2", self.val_r2, on_step=False, on_epoch=True, prog_bar=False)
 
     def on_validation_epoch_end(self) -> None:
-        f1 = self.val_f1.compute()  # Get current val F1
-        self.val_f1_best(f1)  # Update best so far (highest) val F1
-        self.log("val/f1_best", self.val_f1_best.compute(), sync_dist=True, prog_bar=True)
+        mse = self.val_mse.compute()  # Get current val MSE
+        self.val_mse_best(mse)  # Update best so far (lowest) val MSE
+        self.log("val/mse_best", self.val_mse_best.compute(), sync_dist=True, prog_bar=True)
 
     def test_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
         loss, predictions, targets = self.model_step(batch)
 
         # Update and log metrics
         self.test_loss(loss)
-        self.test_acc(predictions, targets)
-        self.test_precision(predictions, targets)
-        self.test_recall(predictions, targets)
-        self.test_f1(predictions, targets)
-        self.test_auroc(predictions, targets)
+        self.test_mse(predictions, targets)
+        self.test_mae(predictions, targets)
+        self.test_r2(predictions, targets)
 
         self.log("test/loss", self.test_loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log("test/acc", self.test_acc, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("test/precision", self.test_precision, on_step=False, on_epoch=True)
-        self.log("test/recall", self.test_recall, on_step=False, on_epoch=True)
-        self.log("test/f1", self.test_f1, on_step=False, on_epoch=True, prog_bar=True)
-        self.log("test/auroc", self.test_auroc, on_step=False, on_epoch=True)
+        self.log("test/mse", self.test_mse, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("test/mae", self.test_mae, on_step=False, on_epoch=True, prog_bar=False)
+        self.log("test/r2", self.test_r2, on_step=False, on_epoch=True, prog_bar=False)
 
     def setup(self, stage: str) -> None:
         if self.hparams.compile and stage == "fit":
