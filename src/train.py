@@ -1,4 +1,6 @@
 import os
+import platform
+import socket
 from typing import Optional, Tuple, Dict, Any, List
 import hydra
 import torch
@@ -85,9 +87,24 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         "callbacks": callbacks,
         "logger": logger,
     }
+    hostname = socket.gethostname()
     if logger:
         log.info("Logging hyperparameters!")
         log_hyperparameters(object_dict)
+
+        logger.log_hyperparams({"execution_node": hostname})
+
+        system_info = {
+            "hostname": hostname,
+            "os": platform.platform(),
+            "python": platform.python_version()
+        }
+
+        if "SLURM_JOB_ID" in os.environ:
+            system_info["slurm_job_id"] = os.environ.get("SLURM_JOB_ID")
+            system_info["slurm_nodelist"] = os.environ.get("SLURM_JOB_NODELIST")
+
+        logger.log_hyperparams(system_info)
 
     if cfg.get("train"):
         log.info("Starting training!")
