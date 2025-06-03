@@ -49,7 +49,7 @@ class GraphPredictionDataModule(LightningDataModule):
             if self.scaler:
                 feats = self.scaler.transform(feats)
 
-            feats = feats.to_numpy(dtype=float)
+            #feats = feats.to_numpy(dtype=float)
             self._predict_datasets[graph] = TensorDataset(
                 torch.tensor(ids, dtype=torch.int64),
                 torch.tensor(feats, dtype=torch.float32),
