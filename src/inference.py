@@ -15,16 +15,21 @@ from lightning.pytorch import Trainer
 def inference(cfg: DictConfig):
     model = MLCoarseningModule.load_from_checkpoint(cfg.ckpt_path, map_location=torch.device("cpu"))
 
+    print(f"Loaded model: {model.hparams.model_name} from {cfg.ckpt_path}")
     ckpt_path = Path(cfg.ckpt_path)
+    print(f"Checkpoint path: {ckpt_path}")
     model_dir = ckpt_path.parent.parent
+    print(f"Model directory: {model_dir}")
     pred_dir = Path(model_dir) / "predictions"
+    print(f"Prediction directory: {pred_dir}")
     pred_dir.mkdir(exist_ok=True, parents=True)
 
     model_name = model_dir.name[11:]
+    print(f"Model name: {model_name}")
     create_experiment_json_file(
         name=model_name,
-        instance_folder=pred_dir.name,
-        output_path=model_dir.name
+        instance_folder=str(pred_dir),
+        output_path=str(model_dir)
     )
 
     scaler = model.hparams.scaler
