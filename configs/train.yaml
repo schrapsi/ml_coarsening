@@ -1,3 +1,5 @@
+run_name: ${generate_run_name:}
+
 defaults:
   - _self_
   - data: train_default  # Fixed the path format

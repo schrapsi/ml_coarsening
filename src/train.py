@@ -12,9 +12,11 @@ import joblib
 
 from src.utils.logging_utils import log_hyperparameters
 from src.utils.pylogger import RankedLogger
+from src.utils.run_name_utils import generate_run_name
 
 torch.set_float32_matmul_precision('medium')
 log = RankedLogger(__name__, rank_zero_only=True)
+OmegaConf.register_resolver("generate_run_name", lambda: generate_run_name())
 
 def instantiate_callbacks(callbacks_cfg: DictConfig) -> List[Callback]:
     callbacks: List[Callback] = []
