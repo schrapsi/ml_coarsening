@@ -1,4 +1,5 @@
 _target_: src.models.ml_coarsening_module.MLCoarseningModule
+name: "MSE Regression"
 
 optimizer:
   _target_: torch.optim.Adam

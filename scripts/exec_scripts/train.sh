@@ -10,5 +10,5 @@ srun uv run -m src.train \
  trainer.enable_progress_bar=False \
  data=mss_1_20 \
  trainer=gpu \
- data.features_file=/nfs/home/schrape/ml_coarsening/configs/data/features/cost_0_half.txt \
- paths.log_dir=/nfs/work/students/ml_coarsening
+ data.features_file=/nfs/home/schrape/ml_coarsening/configs/data/features/cost_0.txt \
+ paths.log_dir=/nfs/work/students/ml_coarsening/logs/
