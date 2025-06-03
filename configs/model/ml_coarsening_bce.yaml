@@ -1,5 +1,4 @@
 _target_: src.models.ml_coarsening_bce_module.MLCoarseningBCEModule
-name: "BCE Regression"
 
 optimizer:
   _target_: torch.optim.Adam

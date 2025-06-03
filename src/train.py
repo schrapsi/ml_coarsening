@@ -93,9 +93,9 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     hostname = socket.gethostname()
     if logger:
         log.info("Logging hyperparameters!")
+        model_class_name = type(model).__name__
+        logger.log_hyperparams({"model_class": model_class_name})
         log_hyperparameters(object_dict)
-
-        logger.log_hyperparams({"execution_node": hostname})
 
         system_info = {
             "hostname": hostname,
@@ -105,7 +105,6 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
 
         if "SLURM_JOB_ID" in os.environ:
             system_info["slurm_job_id"] = os.environ.get("SLURM_JOB_ID")
-            system_info["slurm_nodelist"] = os.environ.get("SLURM_JOB_NODELIST")
 
         logger.log_hyperparams(system_info)
 
