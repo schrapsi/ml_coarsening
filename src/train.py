@@ -9,6 +9,7 @@ from lightning import LightningDataModule, LightningModule, Trainer, Callback
 from lightning.pytorch.loggers import Logger
 from hydra.utils import to_absolute_path
 import joblib
+from omegaconf import OmegaConf
 
 from src.utils.logging_utils import log_hyperparameters
 from src.utils.pylogger import RankedLogger
