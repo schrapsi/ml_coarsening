@@ -1,11 +1,15 @@
 #!/bin/bash
+RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
+MODEL_DIR=2025-06-03_clever_grasshopper_761
+EPOCH=022
+
 cd ~ || exit
 cd ml_coarsening || exit
 spack env activate ml_coarsening
 source .venv/bin/activate
 git pull
 HYDRA_FULL_ERROR=1 srun uv run -m src.inference \
-  ckpt_path=nfs/work/students/ml_coarsening/logs/train/runs/2025-06-03_clever_grasshopper_761/checkpoints/epoch_022.ckpt
+  ckpt_path=$RUNS_DIR/$MODEL_DIR/checkpoints/epoch_$EPOCH.ckpt
 
 echo "====================="
 echo "graph predictions done"
@@ -28,7 +32,7 @@ spack env activate test
 source hypergraph_partitioner/env.sh
 source bachelor_thesis/venv/bin/activate
 cd hypergraph_partitioner/experiments/ || exit
-python ~/hypergraph_partitioner/setup_experiments.py experiment.json -f
-python ~/hypergraph_partitioner/experiments/execute_experiments.py experiment.json
+python ~/hypergraph_partitioner/setup_experiments.py $RUNS_DIR/$MODEL_DIR/experiment.json -f
+python ~/hypergraph_partitioner/experiments/execute_experiments.py $RUNS_DIR/$MODEL_DIR/experiment.json
 
 

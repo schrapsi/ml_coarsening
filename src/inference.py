@@ -58,11 +58,9 @@ def create_experiment_json_file(name: str, instance_folder: str, output_path: st
     data["name"] = name
     data["graph_instance_folder"] = instance_folder
 
-    file_name = name + "_experiment.json"
-    output_path = Path(output_path) / file_name
+    output_path = Path(output_path) / "experiment.json"
     with open(output_path, "w") as file:
         json.dump(data, file, indent=4)
-
 
 def write_to_file(path, graph_name, ids, preds):
     out_path = Path(path) / f"{graph_name}.metis.freq.csv"
