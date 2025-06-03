@@ -15,9 +15,8 @@ def inference(cfg: DictConfig):
     model = MLCoarseningModule.load_from_checkpoint(cfg.ckpt_path, map_location=torch.device("cpu"))
 
     ckpt_path = Path(cfg.ckpt_path)
-    run_dir = ckpt_path.parent.parent
-    model_name = run_dir.name
-    pred_dir = Path(cfg.pred_path) / model_name
+    model_dir = ckpt_path.parent.parent
+    pred_dir = Path(model_dir) / "predictions"
     pred_dir.mkdir(exist_ok=True, parents=True)
 
 
