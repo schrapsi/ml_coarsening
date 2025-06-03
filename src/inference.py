@@ -15,7 +15,6 @@ from lightning.pytorch import Trainer
 def inference(cfg: DictConfig):
     model = MLCoarseningModule.load_from_checkpoint(cfg.ckpt_path, map_location=torch.device("cpu"))
 
-    print(f"Loaded model: {model.hparams.model_name} from {cfg.ckpt_path}")
     ckpt_path = Path(cfg.ckpt_path)
     print(f"Checkpoint path: {ckpt_path}")
     model_dir = ckpt_path.parent.parent
