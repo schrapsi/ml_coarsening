@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 from pathlib import Path
@@ -19,6 +20,12 @@ def inference(cfg: DictConfig):
     pred_dir = Path(model_dir) / "predictions"
     pred_dir.mkdir(exist_ok=True, parents=True)
 
+    model_name = model_dir.name[11:]
+    create_experiment_json_file(
+        name=model_name,
+        instance_folder=pred_dir.name,
+        output_path=model_dir.name
+    )
 
     scaler = model.hparams.scaler
     features = model.hparams.features
@@ -37,6 +44,20 @@ def inference(cfg: DictConfig):
         ids = raw_outputs[0]["ids"]  # shape [B, 2]
         preds = raw_outputs[0]["preds"]
         write_to_file(pred_dir, graph, ids, preds)
+
+
+def create_experiment_json_file(name: str, instance_folder: str, output_path: str):
+    file_path = "/nfs/home/schrape/hypergraph_partitioner/experiments/experiment.json"
+    with open(file_path, "r") as file:
+        data = json.load(file)
+
+    data["name"] = name
+    data["graph_instance_folder"] = instance_folder
+
+    file_name = name + "_experiment.json"
+    output_path = Path(output_path) / file_name
+    with open(output_path, "w") as file:
+        json.dump(data, file, indent=4)
 
 
 def write_to_file(path, graph_name, ids, preds):
