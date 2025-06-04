@@ -1,0 +1,10 @@
+# @package _global_
+defaults:
+  - override /data: binary
+  - override /model: binary_class
+  - override /callbacks: default
+  - override /trainer: default
+
+data:
+  graphs_file: ${paths.root_dir}/configs/data/graphs/mss_1_20.txt
+  features_file: ${paths.root_dir}/configs/data/features/cost_0.txt
