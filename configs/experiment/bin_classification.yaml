@@ -8,3 +8,11 @@ defaults:
 data:
   graphs_file: ${paths.root_dir}/configs/data/graphs/mss_1_20.txt
   features_file: ${paths.root_dir}/configs/data/features/all.txt
+
+callbacks:
+  early_stopping:
+    monitor: "val/f1"
+    mode: "max"
+  model_checkpoint:
+    monitor: "val/f1"
+    mode: "max"
