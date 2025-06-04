@@ -10,6 +10,7 @@ defaults:
   - paths: default
   - debug: null
   - hydra: default
+  - experiment: null
 
 train: True
 test: True
