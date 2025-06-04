@@ -11,12 +11,14 @@ echo "===================="
 echo "building file done"
 echo "===================="
 
+EXPERIMENT_JSON=/nfs/work/students/ml_coarsening/logs/train/runs/2025-06-03_optimistic_newt_320/experiment.json
+
 cd ~ || exit
 spack env activate test
 source hypergraph_partitioner/env.sh
 source bachelor_thesis/venv/bin/activate
 cd hypergraph_partitioner/experiments/ || exit
-python ~/hypergraph_partitioner/setup_experiments.py experiment.json -f
-python ~/hypergraph_partitioner/experiments/execute_experiments.py experiment.json
+python ~/hypergraph_partitioner/setup_experiments.py $EXPERIMENT_JSON -f
+python ~/hypergraph_partitioner/experiments/execute_experiments.py $EXPERIMENT_JSON
 
 

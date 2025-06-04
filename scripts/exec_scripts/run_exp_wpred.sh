@@ -1,7 +1,7 @@
 #!/bin/bash
 RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
-MODEL_DIR=2025-06-03_clever_grasshopper_761
-EPOCH=022
+MODEL_DIR=2025-06-03_optimistic_newt_320
+EPOCH=014
 
 cd ~ || exit
 cd ml_coarsening || exit
