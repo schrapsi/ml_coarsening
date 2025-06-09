@@ -15,20 +15,25 @@ from lightning.pytorch import Trainer
 def inference(cfg: DictConfig):
     model = MLCoarseningModule.load_from_checkpoint(cfg.ckpt_path, map_location=torch.device("cpu"))
 
+    graph_file_path = Path(cfg.data.graphs_file)
+    graph_set_name = graph_file_path.stem
+
     ckpt_path = Path(cfg.ckpt_path)
     print(f"Checkpoint path: {ckpt_path}")
     model_dir = ckpt_path.parent.parent
     print(f"Model directory: {model_dir}")
-    pred_dir = Path(model_dir) / "predictions"
+    pred_dir = Path(model_dir) / "predictions" / graph_set_name
     print(f"Prediction directory: {pred_dir}")
     pred_dir.mkdir(exist_ok=True, parents=True)
 
     model_name = model_dir.name[11:]
+
     print(f"Model name: {model_name}")
     create_experiment_json_file(
         name=model_name,
         instance_folder=str(pred_dir),
-        output_path=str(model_dir)
+        output_path=str(model_dir),
+        graph_set_name=graph_set_name
     )
 
     scaler = model.hparams.scaler
@@ -50,7 +55,7 @@ def inference(cfg: DictConfig):
         write_to_file(pred_dir, graph, ids, preds)
 
 
-def create_experiment_json_file(name: str, instance_folder: str, output_path: str):
+def create_experiment_json_file(name: str, instance_folder: str, output_path: str, graph_set_name: str):
     file_path = "/nfs/home/schrape/hypergraph_partitioner/experiments/experiment.json"
     with open(file_path, "r") as file:
         data = json.load(file)
@@ -58,7 +63,7 @@ def create_experiment_json_file(name: str, instance_folder: str, output_path: st
     data["name"] = name
     data["graph_instance_folder"] = instance_folder
 
-    output_path = Path(output_path) / "experiment.json"
+    output_path = Path(output_path) / f"{graph_set_name}_experiment.json"
     with open(output_path, "w") as file:
         json.dump(data, file, indent=4)
 
