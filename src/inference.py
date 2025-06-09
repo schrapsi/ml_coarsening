@@ -63,7 +63,7 @@ def create_experiment_json_file(name: str, instance_folder: str, output_path: st
     data["name"] = name
     data["graph_instance_folder"] = instance_folder
 
-    output_path = Path(output_path) / f"{graph_set_name}_experiment.json"
+    output_path = Path(output_path) / f"predictions/{graph_set_name}_experiment.json"
     with open(output_path, "w") as file:
         json.dump(data, file, indent=4)
 

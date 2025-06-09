@@ -3,8 +3,8 @@ RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
 GRAPHS_DIR=$HOME/ml_coarsening/configs/data/graphs
 
 GRAPH_SET=mss_1_20_eval
-MODEL_DIR=2025-06-03_optimistic_newt_320
-EPOCH=014
+MODEL_DIR=2025-06-07_cheerful_camel_877
+EPOCH=001
 
 cd ~ || exit
 cd ml_coarsening || exit
