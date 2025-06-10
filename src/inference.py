@@ -6,6 +6,9 @@ from typing import Optional, Tuple, Dict, Any
 
 import torch
 import hydra
+
+from src.models.ml_coarsening_bce_module import MLCoarseningBCEModule
+from src.models.binary_classification_module import BinaryClassificationModule
 from src.models.ml_coarsening_module import MLCoarseningModule
 from lightning import LightningDataModule
 from omegaconf import DictConfig
@@ -13,7 +16,7 @@ from lightning.pytorch import Trainer
 
 
 def inference(cfg: DictConfig):
-    model = MLCoarseningModule.load_from_checkpoint(cfg.ckpt_path, map_location=torch.device("cpu"))
+    model = load_model(cfg.ckpt_path)
 
     graph_file_path = Path(cfg.data.graphs_file)
     graph_set_name = graph_file_path.stem
@@ -93,6 +96,26 @@ def copy_metis_files(src_folder, dest_folder, graph_set):
             print(f"Copied: {src_path} -> {dest_path}")
         else:
             print(f"File not found: {src_path}, skipping copy.")
+
+
+def load_model(ckpt_path):
+    """Load model from checkpoint by detecting the model class from checkpoint."""
+    # Load checkpoint metadata without loading the full model
+    checkpoint = torch.load(ckpt_path, map_location=torch.device("cpu"))
+
+    # Extract the class path from the checkpoint
+    if "hyper_parameters" in checkpoint and "net" in checkpoint["hyper_parameters"]:
+        # Check what kind of model it is based on saved configurations
+        if hasattr(checkpoint, "pytorch-lightning_version"):
+            # For newer Lightning checkpoints that store model class path
+            model_class_path = checkpoint.get("pytorch-lightning_class_path", "")
+            if "BinaryClassificationModule" in model_class_path:
+                return BinaryClassificationModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))
+            elif "MLCoarseningBCEModule" in model_class_path:
+                return MLCoarseningBCEModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))
+
+    # Default or fallback to MLCoarseningModule
+    return MLCoarseningModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))
 
 
 @hydra.main(version_base="1.3", config_path="../configs", config_name="inference.yaml")
