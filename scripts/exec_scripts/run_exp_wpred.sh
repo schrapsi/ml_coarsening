@@ -3,8 +3,8 @@ RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
 GRAPHS_DIR=$HOME/ml_coarsening/configs/data/graphs
 
 GRAPH_SET=mss_1_20_eval
-MODEL_DIR=2025-06-07_cheerful_camel_877
-EPOCH=001
+MODEL_DIR=2025-06-03_gentle_ostrich_093
+EPOCH=095
 
 cd ~ || exit
 cd ml_coarsening || exit
@@ -55,8 +55,8 @@ DEST_DIR="$RUNS_DIR/$MODEL_DIR/exp_results"
 
 mkdir -p "$DEST_DIR"
 
-cp "$RESULTS_DIR/mt_kahypar_ml.csv" "$DEST_DIR/${MODEL_NAME}_${GRAPH_SET}.csv"
-cp "$RESULTS_DIR/mt_kahypar_ml_constrained.csv" "$DEST_DIR/${MODEL_NAME}_${GRAPH_SET}_c.csv"
+cp "$RESULTS_DIR/mt_kahypar_ml.csv" "$DEST_DIR/${MODEL_NAME}-${GRAPH_SET}.csv"
+cp "$RESULTS_DIR/mt_kahypar_ml_constrained.csv" "$DEST_DIR/${MODEL_NAME}-${GRAPH_SET}-c.csv"
 
 echo "===================="
 echo "results copied to $DEST_DIR"
