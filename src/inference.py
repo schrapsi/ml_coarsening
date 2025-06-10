@@ -101,7 +101,7 @@ def copy_metis_files(src_folder, dest_folder, graph_set):
 def load_model(ckpt_path):
     """Load model from checkpoint by detecting the model class from checkpoint."""
     # Load checkpoint metadata without loading the full model
-    checkpoint = torch.load(ckpt_path, map_location=torch.device("cpu"))
+    checkpoint = torch.load(ckpt_path, map_location=torch.device("cpu"), weights_only=False)
 
     # Extract the class path from the checkpoint
     if "hyper_parameters" in checkpoint and "net" in checkpoint["hyper_parameters"]:
