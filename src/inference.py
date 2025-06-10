@@ -110,11 +110,14 @@ def load_model(ckpt_path):
             # For newer Lightning checkpoints that store model class path
             model_class_path = checkpoint.get("pytorch-lightning_class_path", "")
             if "BinaryClassificationModule" in model_class_path:
+                print("Loading BinaryClassificationModule from checkpoint")
                 return BinaryClassificationModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))
             elif "MLCoarseningBCEModule" in model_class_path:
+                print("Loading MLCoarseningBCEModule from checkpoint")
                 return MLCoarseningBCEModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))
 
     # Default or fallback to MLCoarseningModule
+    print("Loading MLCoarseningModule from checkpoint")
     return MLCoarseningModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))
 
 
