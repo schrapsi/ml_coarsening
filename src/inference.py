@@ -32,12 +32,12 @@ def inference(cfg: DictConfig):
     model_name = model_dir.name[11:]
 
     print(f"Model name: {model_name}")
-    # create_experiment_json_file(
-    #     name=model_name,
-    #     instance_folder=str(pred_dir),
-    #     output_path=str(model_dir),
-    #     graph_set_name=graph_set_name
-    # )
+    create_experiment_json_file(
+        name=model_name,
+        instance_folder=str(pred_dir),
+        output_path=str(model_dir),
+        graph_set_name=graph_set_name
+    )
 
     scaler = model.hparams.scaler
     features = model.hparams.features
