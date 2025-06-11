@@ -26,3 +26,4 @@ net:
   with_sigmoid: false
   with_batch_norm: true
 scaler: None
+pos_weight: 9.0
