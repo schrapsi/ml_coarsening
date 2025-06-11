@@ -66,6 +66,16 @@ class BinaryClassificationDataModule(LightningDataModule):
         # Convert frequency to binary labels using threshold
         binary_labels = (combined['frequency'] >= self.threshold).astype(int)
 
+        positive_count = binary_labels.sum()
+        total_count = len(binary_labels)
+        negative_count = total_count - positive_count
+
+        # Print class imbalance statistics
+        print(f"Class distribution:")
+        print(f"  Positive (1): {positive_count} ({positive_count / total_count:.2%})")
+        print(f"  Negative (0): {negative_count} ({negative_count / total_count:.2%})")
+        print(f"  Ratio (pos:neg): 1:{negative_count / positive_count:.2f}")
+
         # Split into train, val, test DataFrames
         train_frac, val_frac, test_frac = self.split
         assert abs(train_frac + val_frac + test_frac - 1.0) < 1e-6, "Splits must sum to 1."

@@ -7,6 +7,7 @@ num_workers: 11
 train_val_test_split: [0.7, 0.15, 0.15]
 data_amount: 1000000
 threshold: 0.1
+pos_weight: 9.0
 scaler:
   _target_: sklearn.preprocessing.StandardScaler
   with_mean: True

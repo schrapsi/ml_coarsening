@@ -16,13 +16,14 @@ class BinaryClassificationModule(LightningModule):
             scaler=None,
             features=None,
             compile: bool = False,
+            pos_weight: float = 1.0
     ) -> None:
         super().__init__()
         self.save_hyperparameters(logger=False, ignore=["net"])
         self.net = net
 
         # Binary classification loss function
-        self.criterion = torch.nn.BCEWithLogitsLoss()
+        self.criterion = torch.nn.BCEWithLogitsLoss(pos_weight=torch.tensor(pos_weight))
 
         # Train metrics
         self.train_acc = Accuracy(task="binary")
