@@ -102,7 +102,7 @@ def load_model(ckpt_path, model_class=None):
     """Load model from checkpoint by detecting the model class from checkpoint."""
     if model_class == "BinaryClassificationModule" :
         print("Loading BinaryClassificationModule from checkpoint")
-        return BinaryClassificationModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))
+        return BinaryClassificationModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"), strict=False)
     elif model_class == "MLCoarseningBCEModule":
         print("Loading MLCoarseningBCEModule from checkpoint")
         return MLCoarseningBCEModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))
