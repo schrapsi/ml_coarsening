@@ -21,7 +21,7 @@ class GraphDataModule(LightningDataModule):
             num_workers: int = 0,
             train_val_test_split: list[float] = [0.7, 0.15, 0.15],
             data_amount: int = None,
-            scaler = None,
+            scaler=None,
     ):
         super().__init__()
         self.data_dir = data_dir
@@ -71,44 +71,72 @@ class GraphDataModule(LightningDataModule):
         train_frac, val_frac, test_frac = self.split
         assert abs(train_frac + val_frac + test_frac - 1.0) < 1e-6, "Splits must sum to 1."
 
-        train_df, temp_df = train_test_split(
-            combined,
-            test_size=(val_frac + test_frac),
-            random_state=42
-        )
-        val_df, test_df = train_test_split(
-            temp_df,
-            test_size=test_frac / (val_frac + test_frac),
-            random_state=42
-        )
+        # Check if validation or test fractions are zero
+        use_train_for_val = val_frac < 1e-6
+        use_train_for_test = test_frac < 1e-6
+
+        # Normal splitting if both val and test are non-zero
+        if not (use_train_for_val or use_train_for_test):
+            train_df, temp_df = train_test_split(
+                combined,
+                test_size=(val_frac + test_frac),
+                random_state=42
+            )
+            val_df, test_df = train_test_split(
+                temp_df,
+                test_size=test_frac / (val_frac + test_frac),
+                random_state=42
+            )
+        else:
+            train_df = combined
+            val_df = train_df if use_train_for_val else pd.DataFrame()
+            test_df = train_df if use_train_for_test else pd.DataFrame()
+            if not use_train_for_val and not use_train_for_test:
+                # Handle case where only one is zero
+                val_test_df = combined.sample(frac=(val_frac + test_frac), random_state=42)
+                if use_train_for_val:
+                    test_df = val_test_df
+                else:
+                    val_df = val_test_df
 
         # 3. Separate features and target
         X_train = train_df.drop('frequency', axis=1)
         y_train = train_df['frequency']
-        X_val = val_df.drop('frequency', axis=1)
-        y_val = val_df['frequency']
-        X_test = test_df.drop('frequency', axis=1)
-        y_test = test_df['frequency']
 
-        # 4. Fit scaler on train and transform all splits
+        # 4. Fit scaler on train
         self.scaler.fit(X_train)
         X_train_scaled = self.scaler.transform(X_train)
-        X_val_scaled = self.scaler.transform(X_val)
-        X_test_scaled = self.scaler.transform(X_test)
 
-        # 5. Convert to tensors and wrap into datasets
+        # 5. Create train dataset
         self.train_dataset = TensorDataset(
             torch.tensor(X_train_scaled, dtype=torch.float32),
             torch.tensor(y_train.values, dtype=torch.float32).unsqueeze(1)
         )
-        self.val_dataset = TensorDataset(
-            torch.tensor(X_val_scaled, dtype=torch.float32),
-            torch.tensor(y_val.values, dtype=torch.float32).unsqueeze(1)
-        )
-        self.test_dataset = TensorDataset(
-            torch.tensor(X_test_scaled, dtype=torch.float32),
-            torch.tensor(y_test.values, dtype=torch.float32).unsqueeze(1)
-        )
+
+        # 6. Create val dataset (using train if needed)
+        if use_train_for_val:
+            self.val_dataset = self.train_dataset
+        else:
+            X_val = val_df.drop('frequency', axis=1)
+            y_val = val_df['frequency']
+            X_val_scaled = self.scaler.transform(X_val)
+            self.val_dataset = TensorDataset(
+                torch.tensor(X_val_scaled, dtype=torch.float32),
+                torch.tensor(y_val.values, dtype=torch.float32).unsqueeze(1)
+            )
+
+        # 7. Create test dataset (using train if needed)
+        if use_train_for_test:
+            self.test_dataset = self.train_dataset
+        else:
+            X_test = test_df.drop('frequency', axis=1)
+            y_test = test_df['frequency']
+            X_test_scaled = self.scaler.transform(X_test)
+            self.test_dataset = TensorDataset(
+                torch.tensor(X_test_scaled, dtype=torch.float32),
+                torch.tensor(y_test.values, dtype=torch.float32).unsqueeze(1)
+            )
+
 
     def train_dataloader(self):
         # Return the train dataloader
@@ -119,6 +147,7 @@ class GraphDataModule(LightningDataModule):
             num_workers=self.num_workers
         )
 
+
     def val_dataloader(self):
         # Return the validation dataloader
         return DataLoader(
@@ -127,6 +156,7 @@ class GraphDataModule(LightningDataModule):
             shuffle=False,
             num_workers=self.num_workers
         )
+
 
     def test_dataloader(self):
         # Return the test dataloader
@@ -137,12 +167,14 @@ class GraphDataModule(LightningDataModule):
             num_workers=self.num_workers
         )
 
+
     def get_feature_count(self):
         # Return the number of features
         if self.features:
             return len(self.features)
         else:
             raise ValueError("Features not specified or not found in the dataset.")
+
 
 if __name__ == "__main__":
     # Example usage
