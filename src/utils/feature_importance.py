@@ -129,9 +129,9 @@ def analyze_feature_importance(data_dir, graph_names, features_file, model_path)
     corr_results = correlation_analysis(data)
     print(f"Top 10 correlated features:\n{corr_results.head(10)}")
 
-    print("\nRunning permutation importance...")
-    perm_results = permutation_importance_analysis(model, X_scaled, y.values, X.columns)
-    print(f"Top 10 important features:\n{perm_results.head(10)}")
+    #print("\nRunning permutation importance...")
+    #perm_results = permutation_importance_analysis(model, X_scaled, y.values, X.columns)
+    #print(f"Top 10 important features:\n{perm_results.head(10)}")
 
     print("\nRunning SHAP analysis...")
     shap_values = shap_analysis(model, X_scaled, X.columns)
