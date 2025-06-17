@@ -7,8 +7,8 @@ from sklearn.inspection import permutation_importance
 import shap
 from pathlib import Path
 
+from src.models.ml_coarsening_module import MLCoarseningModule
 from src.utils.data_import import feature_matrix_n_performance
-from src.models.modules.mlp_module import MLPModule  # Adjust import as needed
 
 
 # 1. Load and prepare data from the problematic graphs
@@ -123,7 +123,7 @@ def analyze_feature_importance(data_dir, graph_names, features_file, model_path)
     X_scaled = scaler.fit_transform(X)
 
     # Load model
-    model = MLPModule.load_from_checkpoint(model_path)
+    model = MLCoarseningModule.load_from_checkpoint(model_path)
 
     print("Running correlation analysis...")
     corr_results = correlation_analysis(data)
