@@ -123,7 +123,7 @@ def analyze_feature_importance(data_dir, graph_names, features_file, model_path)
     X_scaled = scaler.fit_transform(X)
 
     # Load model
-    model = MLCoarseningModule.load_from_checkpoint(model_path)
+    model = MLCoarseningModule.load_from_checkpoint(model_path, map_location=torch.device('cpu'))
 
     print("Running correlation analysis...")
     corr_results = correlation_analysis(data)
