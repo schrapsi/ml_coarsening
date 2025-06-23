@@ -1,0 +1,18 @@
+# @package _global_
+defaults:
+  - override /data: multi_class
+  - override /model: multi_class
+  - override /callbacks: default
+  - override /trainer: default
+
+data:
+  graphs_file: ${paths.root_dir}/configs/data/graphs/mss_45_69.txt
+  features_file: ${paths.root_dir}/configs/data/features/all.txt
+
+callbacks:
+  early_stopping:
+    monitor: "val/f1"
+    mode: "max"
+  model_checkpoint:
+    monitor: "val/f1"
+    mode: "max"
