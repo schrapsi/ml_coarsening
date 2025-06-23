@@ -3,10 +3,13 @@ from typing import Any, Dict, Tuple
 import hydra
 import torch
 from lightning import LightningModule
+from kornia.losses import FocalLoss
 import torchmetrics as tm
 from torchmetrics.classification import (
     Accuracy, F1Score, Precision, Recall, ConfusionMatrix
 )
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 class MulticlassClassificationModule(LightningModule):
@@ -19,7 +22,8 @@ class MulticlassClassificationModule(LightningModule):
             scaler=None,
             features=None,
             compile: bool = False,
-            class_weights=None
+            class_weights=None,
+            focal_gamma: float = 2.0
     ) -> None:
         super().__init__()
         self.save_hyperparameters(logger=False, ignore=["net"])
@@ -28,9 +32,9 @@ class MulticlassClassificationModule(LightningModule):
 
         # Multiclass classification loss function
         if class_weights is not None:
-            self.criterion = torch.nn.CrossEntropyLoss(weight=torch.tensor(class_weights))
+            self.criterion = FocalLoss(alpha=class_weights, gamma=focal_gamma, reduction='mean')
         else:
-            self.criterion = torch.nn.CrossEntropyLoss()
+            self.criterion = FocalLoss(alpha=1.0, gamma=focal_gamma, reduction='mean')
 
         # Train metrics
         self.train_acc = Accuracy(task="multiclass", num_classes=num_classes)
@@ -129,11 +133,17 @@ class MulticlassClassificationModule(LightningModule):
         self.val_f1_best(f1)  # Update best so far (highest) val F1
         self.log("val/f1_best", self.val_f1_best.compute(), sync_dist=True, prog_bar=True)
 
-        # Log confusion matrix as figure (optional)
-        # confmat = self.val_confmat.compute().cpu().numpy()
-        # self.logger.experiment.add_figure(
-        #    "val/confusion_matrix", plot_confusion_matrix(confmat), self.current_epoch
-        # )
+        plt.figure(figsize=(10, 8))
+        confmat = self.val_confmat.compute().cpu().numpy()
+        sns.heatmap(confmat, annot=True, fmt='d', cmap='Blues')
+        plt.xlabel('Predicted labels')
+        plt.ylabel('True labels')
+        plt.title('Confusion Matrix')
+
+        self.logger.experiment.add_figure(
+            "val/confusion_matrix", plt.gcf(), self.current_epoch
+        )
+        plt.close()
 
     def test_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
         loss, probs, targets = self.model_step(batch)
