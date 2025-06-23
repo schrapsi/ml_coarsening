@@ -140,6 +140,6 @@ def analyze_feature_importance(data_dir, graph_names, features_file, model_path)
 
     return {
         'correlation': corr_results,
-        'permutation': perm_results,
+        #'permutation': perm_results,
         'shap_values': shap_values
     }
