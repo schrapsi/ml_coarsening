@@ -32,9 +32,23 @@ class MulticlassClassificationModule(LightningModule):
 
         # Multiclass classification loss function
         if class_weights is not None:
-            self.criterion = FocalLoss(alpha=class_weights, gamma=focal_gamma, reduction='mean')
+            self.criterion = torch.hub.load(
+            'adeelh/pytorch-multi-class-focal-loss',
+            model='focal_loss',
+            alpha=class_weights,
+            gamma=2,
+            reduction='mean',
+            dtype=torch.float32,
+            force_reload=False)
         else:
-            self.criterion = FocalLoss(alpha=1.0, gamma=focal_gamma, reduction='mean')
+            self.criterion = torch.hub.load(
+                'adeelh/pytorch-multi-class-focal-loss',
+                model='focal_loss',
+                alpha=1.0,
+                gamma=2,
+                reduction='mean',
+                dtype=torch.float32,
+                force_reload=False)
 
         # Train metrics
         self.train_acc = Accuracy(task="multiclass", num_classes=num_classes)
