@@ -147,17 +147,17 @@ class MulticlassClassificationModule(LightningModule):
         self.val_f1_best(f1)  # Update best so far (highest) val F1
         self.log("val/f1_best", self.val_f1_best.compute(), sync_dist=True, prog_bar=True)
 
-        plt.figure(figsize=(10, 8))
-        confmat = self.val_confmat.compute().cpu().numpy()
-        sns.heatmap(confmat, annot=True, fmt='d', cmap='Blues')
-        plt.xlabel('Predicted labels')
-        plt.ylabel('True labels')
-        plt.title('Confusion Matrix')
+        #plt.figure(figsize=(10, 8))
+        #confmat = self.val_confmat.compute().cpu().numpy()
+        #sns.heatmap(confmat, annot=True, fmt='d', cmap='Blues')
+        #plt.xlabel('Predicted labels')
+        #plt.ylabel('True labels')
+        #plt.title('Confusion Matrix')
 
-        self.logger.experiment.log_figure(
-            "val/confusion_matrix", plt.gcf(), self.current_epoch
-        )
-        plt.close()
+        #self.logger.experiment.log_figure(
+        #    "val/confusion_matrix", plt.gcf(), self.current_epoch
+        #)
+        #plt.close()
 
     def test_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
         loss, probs, targets = self.model_step(batch)
