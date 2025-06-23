@@ -1,4 +1,4 @@
-_target_: src.models.binary_classification_module.BinaryClassificationModule
+_target_: src.models.multi_classification_module.MulticlassClassificationDataModule
 
 num_classes: 10
 scaler: None
