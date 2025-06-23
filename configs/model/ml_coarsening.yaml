@@ -25,4 +25,4 @@ net:
   dropout: 0.5
   with_sigmoid: true
   with_batch_norm: true
-scaler: None
+scaler: null
