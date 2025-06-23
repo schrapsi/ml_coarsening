@@ -3,6 +3,7 @@ _target_: src.models.multi_classification_module.MulticlassClassificationModule
 num_classes: 10
 scaler: null
 class_weights: null
+focal_gamma: 2.0
 
 optimizer:
   _target_: torch.optim.Adam
