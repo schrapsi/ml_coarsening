@@ -154,7 +154,7 @@ class MulticlassClassificationModule(LightningModule):
         plt.ylabel('True labels')
         plt.title('Confusion Matrix')
 
-        self.logger.experiment.add_figure(
+        self.logger.experiment.log_figure(
             "val/confusion_matrix", plt.gcf(), self.current_epoch
         )
         plt.close()
