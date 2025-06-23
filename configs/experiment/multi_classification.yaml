@@ -6,7 +6,7 @@ defaults:
   - override /trainer: default
 
 data:
-  graphs_file: ${paths.root_dir}/configs/data/graphs/mss_45_69.txt
+  graphs_file: ${paths.root_dir}/configs/data/graphs/mss_46_69.txt
   features_file: ${paths.root_dir}/configs/data/features/all.txt
 
 callbacks:
