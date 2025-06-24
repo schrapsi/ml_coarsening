@@ -149,6 +149,7 @@ class MulticlassClassificationModule(LightningModule):
 
         #plt.figure(figsize=(10, 8))
         #confmat = self.val_confmat.compute().cpu().numpy()
+        #print("Confusion Matrix:\n", confmat)
         #sns.heatmap(confmat, annot=True, fmt='d', cmap='Blues')
         #plt.xlabel('Predicted labels')
         #plt.ylabel('True labels')
@@ -175,6 +176,12 @@ class MulticlassClassificationModule(LightningModule):
         self.log("test/f1", self.test_f1, on_step=False, on_epoch=True, prog_bar=True)
         self.log("test/precision", self.test_precision, on_step=False, on_epoch=True)
         self.log("test/recall", self.test_recall, on_step=False, on_epoch=True)
+
+    def on_test_epoch_end(self) -> None:
+        # Get and print the final test confusion matrix
+        confmat = self.test_confmat.compute().cpu().numpy()
+        print("Test Confusion Matrix:")
+        print(confmat)
 
     def setup(self, stage: str) -> None:
         if self.hparams.compile and stage == "fit":
