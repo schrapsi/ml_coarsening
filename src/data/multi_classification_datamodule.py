@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 from lightning import LightningDataModule
+from torch.utils.data import WeightedRandomSampler
 from src.utils.data_import import feature_matrix_n_performance
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.model_selection import train_test_split
@@ -131,10 +132,31 @@ class MulticlassClassificationDataModule(LightningDataModule):
         )
 
     def train_dataloader(self):
+        labels = self.train_dataset.tensors[1].numpy()
+        # Compute class weights inversely proportional to class frequencies
+        class_counts = np.bincount(labels, minlength=self.num_classes)
+        class_weights = 1.0 / class_counts
+        scale_factor = 5.0  # Adjust this value as needed
+        sample_weights = np.ones_like(labels, dtype=np.float32)
+
+        for idx, label in enumerate(labels):
+            if label == 0:  # Class 0 samples
+                sample_weights[idx] = 0.1  # Don't completely ignore class 0
+            else:  # Non-zero classes
+                # Apply higher weight + scale based on class rarity
+                sample_weights[idx] = class_weights[label] * scale_factor
+
+        # Create weighted sampler
+        sampler = WeightedRandomSampler(
+            weights=sample_weights,
+            num_samples=len(sample_weights),
+            replacement=True  # Allow replacement to ensure minority classes appear frequently
+        )
+
         return DataLoader(
             self.train_dataset,
             batch_size=self.batch_size,
-            shuffle=True,
+            sampler=sampler,
             num_workers=self.num_workers
         )
 
