@@ -7,6 +7,8 @@ num_workers: 11
 train_val_test_split: [0.7, 0.15, 0.15]
 data_amount: 1000000
 num_classes: 10
+use_smote: True
+smote_sampling_strategy: "auto"
 scaler:
   _target_: sklearn.preprocessing.StandardScaler
   with_mean: True

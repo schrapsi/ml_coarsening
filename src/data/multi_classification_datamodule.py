@@ -5,6 +5,7 @@ from lightning import LightningDataModule
 from torch.utils.data import WeightedRandomSampler
 from src.utils.data_import import feature_matrix_n_performance
 from torch.utils.data import TensorDataset, DataLoader
+from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
 import torch
 
@@ -21,6 +22,8 @@ class MulticlassClassificationDataModule(LightningDataModule):
             data_amount: int = None,
             scaler=None,
             num_classes: int = 10,  # Default 10 classes (0-9) for range [0,1]
+            use_smote: bool = False,
+            smote_sampling_strategy: str = 'auto',
     ):
         super().__init__()
         self.data_dir = data_dir
@@ -29,6 +32,8 @@ class MulticlassClassificationDataModule(LightningDataModule):
         self.split = train_val_test_split
         self.scaler = scaler
         self.num_classes = num_classes
+        self.use_smote = use_smote
+        self.smote_sampling_strategy = smote_sampling_strategy
 
         if graphs_file and Path(graphs_file).exists():
             with open(graphs_file, 'r') as f:
@@ -117,11 +122,34 @@ class MulticlassClassificationDataModule(LightningDataModule):
         X_val_scaled = self.scaler.transform(X_val)
         X_test_scaled = self.scaler.transform(X_test)
 
-        # Convert to tensors with appropriate types for multiclass classification
-        self.train_dataset = TensorDataset(
-            torch.tensor(X_train_scaled, dtype=torch.float32),
-            torch.tensor(y_train.values, dtype=torch.long)
-        )
+        if self.use_smote:
+            print("Applying SMOTE oversampling to training data...")
+            print(self.get_min_class_samples(y_train))
+            smote = SMOTE(sampling_strategy=self.smote_sampling_strategy,
+                          k_neighbors=min(5, self.get_min_class_samples(y_train)),
+                          random_state=42)
+            X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
+
+            # Print class distribution after SMOTE
+            class_counts_after = np.bincount(y_train_resampled, minlength=self.num_classes)
+            print("Class distribution after SMOTE:")
+            for class_idx, count in enumerate(class_counts_after):
+                lower_bound = class_idx * 0.1
+                upper_bound = (class_idx + 1) * 0.1
+                print(
+                    f"  Class {class_idx} [{lower_bound:.1f}-{upper_bound:.1f}): {count} ({count / len(y_train_resampled):.2%})")
+
+            # Create tensor dataset with SMOTE-resampled data
+            self.train_dataset = TensorDataset(
+                torch.tensor(X_train_resampled, dtype=torch.float32),
+                torch.tensor(y_train_resampled, dtype=torch.long)
+            )
+        else:
+            # Original approach without SMOTE
+            self.train_dataset = TensorDataset(
+                torch.tensor(X_train_scaled, dtype=torch.float32),
+                torch.tensor(y_train.values, dtype=torch.long)
+            )
         self.val_dataset = TensorDataset(
             torch.tensor(X_val_scaled, dtype=torch.float32),
             torch.tensor(y_val.values, dtype=torch.long)
@@ -130,6 +158,11 @@ class MulticlassClassificationDataModule(LightningDataModule):
             torch.tensor(X_test_scaled, dtype=torch.float32),
             torch.tensor(y_test.values, dtype=torch.long)
         )
+
+    def get_min_class_samples(self, y):
+        """Return the count of samples in the smallest class"""
+        class_counts = np.bincount(y, minlength=self.num_classes)
+        return max(1, min([count for count in class_counts if count > 0]))
 
     def train_dataloader(self):
         return DataLoader(
