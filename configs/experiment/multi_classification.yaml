@@ -10,7 +10,7 @@ data:
   features_file: ${paths.root_dir}/configs/data/features/all.txt
 
 model:
-  class_weights: [1.0, 22.0, 38.4, 51.6, 63.4, 80.0, 99.6, 108.4, 106.8, 89.2]
+  class_weights: [1.0, 44.0, 76.8, 103.2, 126.8, 160.0, 199.2, 216.8, 213.6, 178.4]
   focal_gamma: 2.0
 
 callbacks:
