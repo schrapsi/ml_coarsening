@@ -14,6 +14,8 @@ from lightning import LightningDataModule
 from omegaconf import DictConfig
 from lightning.pytorch import Trainer
 
+from src.models.multi_classification_module import MulticlassClassificationModule
+
 
 def inference(cfg: DictConfig):
     model = load_model(cfg.ckpt_path, model_class=cfg.model_class)
@@ -106,6 +108,9 @@ def load_model(ckpt_path, model_class=None):
     elif model_class == "MLCoarseningBCEModule":
         print("Loading MLCoarseningBCEModule from checkpoint")
         return MLCoarseningBCEModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))
+    elif model_class == "MulticlassClassificationModule":
+        print("Loading MulticlassClassificationModule from checkpoint")
+        return MulticlassClassificationModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))
     # Default or fallback to MLCoarseningModule
     print("Loading MLCoarseningModule from checkpoint")
     return MLCoarseningModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))

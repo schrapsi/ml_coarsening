@@ -210,10 +210,13 @@ class MulticlassClassificationModule(LightningModule):
         logits = self(features)  # -> Tensor [B, num_classes]
         probs = torch.softmax(logits, dim=1)
         pred_classes = torch.argmax(probs, dim=1)  # Get predicted class indices
+        frequency_values = (pred_classes.float() + 0.5) / 10.0
+
         return {
             "ids": ids.cpu().numpy(),
-            "preds": pred_classes.cpu().numpy(),
-            "probs": probs.cpu().numpy()  # Return probabilities for all classes
+            "preds": frequency_values.cpu().numpy(),
+            "probs": probs.cpu().numpy(),  # Return probabilities for all classes
+            "raw_classes": pred_classes.cpu().numpy()
         }
 
     @classmethod
