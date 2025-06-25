@@ -41,14 +41,7 @@ class MulticlassClassificationModule(LightningModule):
             dtype=torch.float32,
             force_reload=False)
         else:
-            self.criterion = torch.hub.load(
-                'adeelh/pytorch-multi-class-focal-loss',
-                model='focal_loss',
-                alpha=1.0,
-                gamma=2,
-                reduction='mean',
-                dtype=torch.float32,
-                force_reload=False)
+            self.criterion = torch.nn.CrossEntropyLoss()
 
         # Train metrics
         self.train_acc = Accuracy(task="multiclass", num_classes=num_classes)
