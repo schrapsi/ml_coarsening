@@ -125,49 +125,34 @@ class MulticlassClassificationDataModule(LightningDataModule):
 
         if self.use_smote:
             print("Applying SMOTE oversampling to training data...")
-
-            # Set your target number of samples per class
-            target_samples_per_class = self.class_amount / self.num_classes
-
-            custom_strategy = {}
-            for class_idx in range(self.num_classes):
-                class_count = np.sum(y_train == class_idx)
-                if class_count < target_samples_per_class:
-                    custom_strategy[class_idx] = target_samples_per_class
-
-            # Apply SMOTE with custom strategy (only to minority classes)
-            smote = SMOTE(
-                sampling_strategy=custom_strategy,
-                k_neighbors=min(5, self.get_min_class_samples(y_train)),
-                random_state=42
-            )
+            print(self.get_min_class_samples(y_train))
+            smote = SMOTE(sampling_strategy=self.smote_sampling_strategy,
+                          k_neighbors=min(5, self.get_min_class_samples(y_train)),
+                          random_state=42)
             X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
 
-            # For the majority class that wasn't included in SMOTE, manually undersample
-            # Find indices of majority class samples
             majority_indices = np.where(y_train_resampled == 0)[0]
-            if len(majority_indices) > target_samples_per_class:
-                keep_indices = np.random.choice(majority_indices, target_samples_per_class, replace=False)
+            if len(majority_indices) > self.class_amount:
+                keep_indices = np.random.choice(majority_indices, self.class_amount, replace=False)
                 other_indices = np.where(y_train_resampled != 0)[0]
                 final_indices = np.concatenate([keep_indices, other_indices])
                 X_train_resampled = X_train_resampled[final_indices]
                 y_train_resampled = y_train_resampled[final_indices]
 
-            # Print class distribution after balancing
-            class_counts = np.bincount(y_train_resampled, minlength=self.num_classes)
-            print("Class distribution after balancing:")
-            for class_idx, count in enumerate(class_counts):
+            # Print class distribution after SMOTE
+            class_counts_after = np.bincount(y_train_resampled, minlength=self.num_classes)
+            print("Class distribution after SMOTE:")
+            for class_idx, count in enumerate(class_counts_after):
                 lower_bound = class_idx * 0.1
                 upper_bound = (class_idx + 1) * 0.1
                 print(
                     f"  Class {class_idx} [{lower_bound:.1f}-{upper_bound:.1f}): {count} ({count / len(y_train_resampled):.2%})")
 
-            # Create tensor dataset with balanced data
+            # Create tensor dataset with SMOTE-resampled data
             self.train_dataset = TensorDataset(
                 torch.tensor(X_train_resampled, dtype=torch.float32),
                 torch.tensor(y_train_resampled, dtype=torch.long)
             )
-
 
         else:
             # Original approach without SMOTE
