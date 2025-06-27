@@ -132,12 +132,12 @@ class MulticlassClassificationDataModule(LightningDataModule):
             X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
 
             majority_indices = np.where(y_train_resampled == 0)[0]
-            if len(majority_indices) > self.class_amount:
-                keep_indices = np.random.choice(majority_indices, self.class_amount, replace=False)
-                other_indices = np.where(y_train_resampled != 0)[0]
-                final_indices = np.concatenate([keep_indices, other_indices])
-                X_train_resampled = X_train_resampled[final_indices]
-                y_train_resampled = y_train_resampled[final_indices]
+            #if len(majority_indices) > self.class_amount:
+            #    keep_indices = np.random.choice(majority_indices, self.class_amount, replace=False)
+            #    other_indices = np.where(y_train_resampled != 0)[0]
+            #    final_indices = np.concatenate([keep_indices, other_indices])
+            #    X_train_resampled = X_train_resampled[final_indices]
+            #    y_train_resampled = y_train_resampled[final_indices]
 
             # Print class distribution after SMOTE
             class_counts_after = np.bincount(y_train_resampled, minlength=self.num_classes)
@@ -153,7 +153,6 @@ class MulticlassClassificationDataModule(LightningDataModule):
                 torch.tensor(X_train_resampled, dtype=torch.float32),
                 torch.tensor(y_train_resampled, dtype=torch.long)
             )
-
         else:
             # Original approach without SMOTE
             self.train_dataset = TensorDataset(
