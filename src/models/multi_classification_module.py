@@ -40,6 +40,7 @@ class MulticlassClassificationModule(LightningModule):
             reduction='mean',
             dtype=torch.float32,
             force_reload=False)
+            self.criterion = WeightedOrdinalMSELoss(class_weights=class_weights, num_classes=num_classes)
         else:
             self.criterion = torch.nn.CrossEntropyLoss()
 
@@ -226,3 +227,19 @@ class MulticlassClassificationModule(LightningModule):
         return super(MulticlassClassificationModule, cls).load_from_checkpoint(
             checkpoint_path, map_location=map_location, **kwargs
         )
+
+
+class WeightedOrdinalMSELoss(torch.nn.Module):
+    def __init__(self, class_weights=None, num_classes=10):
+        super().__init__()
+        if class_weights is None:
+            self.class_weights = torch.ones(num_classes)
+        else:
+            self.class_weights = torch.tensor(class_weights)
+
+    def forward(self, logits, targets):
+        probs = torch.softmax(logits, dim=1)
+        pred_classes = torch.sum(probs * torch.arange(logits.size(1)).to(logits.device), dim=1)
+        squared_errors = (pred_classes - targets.float()) ** 2
+        weights = self.class_weights.to(logits.device)[targets]
+        return torch.sum(weights * squared_errors) / torch.sum(weights)
