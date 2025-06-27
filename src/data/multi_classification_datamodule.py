@@ -49,7 +49,7 @@ class MulticlassClassificationDataModule(LightningDataModule):
 
         amount_per_graph = data_amount // len(self.graphs) if data_amount else None
         self.data_amount = amount_per_graph
-        self.class_amount = data_amount / num_classes if data_amount else None
+        self.class_amount = int(data_amount / num_classes) if data_amount else None
 
     def prepare_data(self):
         for graph in self.graphs:
