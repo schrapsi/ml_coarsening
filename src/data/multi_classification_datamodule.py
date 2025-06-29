@@ -123,13 +123,18 @@ class MulticlassClassificationDataModule(LightningDataModule):
                           random_state=42)
             X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
 
-            majority_indices = np.where(y_train_resampled == 0)[0]
-            if len(majority_indices) > self.class_amount:
-                keep_indices = np.random.choice(majority_indices, self.class_amount, replace=False)
-                other_indices = np.where(y_train_resampled != 0)[0]
-                final_indices = np.concatenate([keep_indices, other_indices])
-                X_train_resampled = X_train_resampled[final_indices]
-                y_train_resampled = y_train_resampled[final_indices]
+            final_indices = []
+            for class_id in range(self.num_classes):
+                class_indices = np.where(y_train_resampled == class_id)[0]
+                if len(class_indices) > self.class_amount:
+                    selected_indices = np.random.choice(class_indices, self.class_amount, replace=False)
+                    final_indices.append(selected_indices)
+                else:
+                    final_indices.append(class_indices)
+
+            final_indices = np.concatenate(final_indices)
+            X_train_resampled = X_train_resampled[final_indices]
+            y_train_resampled = y_train_resampled[final_indices]
 
             # Print class distribution after SMOTE
             class_counts_after = np.bincount(y_train_resampled, minlength=self.num_classes)
