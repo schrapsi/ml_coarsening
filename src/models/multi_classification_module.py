@@ -42,7 +42,7 @@ class MulticlassClassificationModule(LightningModule):
             force_reload=False)
             self.criterion = WeightedOrdinalMSELoss(class_weights=class_weights, num_classes=num_classes)
         else:
-            self.criterion = torch.nn.CrossEntropyLoss()
+            self.criterion = WeightedOrdinalMSELoss(num_classes=num_classes)
 
         # Train metrics
         self.train_acc = Accuracy(task="multiclass", num_classes=num_classes)
