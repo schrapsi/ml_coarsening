@@ -72,17 +72,10 @@ class MulticlassClassificationDataModule(LightningDataModule):
 
             combined = pd.concat([combined, fm], axis=0, ignore_index=True)
 
-        # Convert frequency to multiclass labels (0-9)
-        # Clip values to ensure they're in [0,1] range
         frequencies = combined['frequency']
-
-        # Convert to classes 0-9
-        # Class 0 is [0, 0.1), Class 1 is [0.1, 0.2), ..., Class 9 is [0.9, 1.0]
         multiclass_labels = (frequencies * self.num_classes).astype(int)
-        # Handle the edge case where frequency=1.0 (should be class 9, not 10)
         multiclass_labels = np.minimum(multiclass_labels, self.num_classes - 1)
 
-        # Calculate class distribution
         class_counts = multiclass_labels.value_counts().sort_index()
         total_count = len(multiclass_labels)
 
@@ -93,7 +86,6 @@ class MulticlassClassificationDataModule(LightningDataModule):
             upper_bound = (class_idx + 1) * 0.1
             print(f"  Class {class_idx} [{lower_bound:.1f}-{upper_bound:.1f}): {count} ({count / total_count:.2%})")
 
-        # Split into train, val, test DataFrames
         train_frac, val_frac, test_frac = self.split
         assert abs(train_frac + val_frac + test_frac - 1.0) < 1e-6, "Splits must sum to 1."
 
@@ -132,12 +124,12 @@ class MulticlassClassificationDataModule(LightningDataModule):
             X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
 
             majority_indices = np.where(y_train_resampled == 0)[0]
-            #if len(majority_indices) > self.class_amount:
-            #    keep_indices = np.random.choice(majority_indices, self.class_amount, replace=False)
-            #    other_indices = np.where(y_train_resampled != 0)[0]
-            #    final_indices = np.concatenate([keep_indices, other_indices])
-            #    X_train_resampled = X_train_resampled[final_indices]
-            #    y_train_resampled = y_train_resampled[final_indices]
+            if len(majority_indices) > self.class_amount:
+                keep_indices = np.random.choice(majority_indices, self.class_amount, replace=False)
+                other_indices = np.where(y_train_resampled != 0)[0]
+                final_indices = np.concatenate([keep_indices, other_indices])
+                X_train_resampled = X_train_resampled[final_indices]
+                y_train_resampled = y_train_resampled[final_indices]
 
             # Print class distribution after SMOTE
             class_counts_after = np.bincount(y_train_resampled, minlength=self.num_classes)
