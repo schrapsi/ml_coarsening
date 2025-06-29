@@ -148,7 +148,8 @@ class MulticlassClassificationDataModule(LightningDataModule):
             # Create tensor dataset with SMOTE-resampled data
             self.train_dataset = TensorDataset(
                 torch.tensor(X_train_resampled, dtype=torch.float32),
-                torch.tensor(y_train_resampled, dtype=torch.long)
+                torch.tensor(y_train_resampled.values if hasattr(y_train_resampled, 'values') else y_train_resampled,
+                             dtype=torch.long)
             )
         else:
             # Original approach without SMOTE
