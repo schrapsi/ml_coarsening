@@ -7,11 +7,8 @@ source .venv/bin/activate
 git pull
 srun uv run -m src.train \
  trainer.enable_progress_bar=False \
- trainer=cpu \
- model.focal_gamma=4.0 \
- experiment=multi_classification \
- model.class_weights=null \
- data.smote_sampling_strategy="minority" \
+ trainer=gpu \
+ model.net.hidden_sizes="[16, 8, 4]" \
  data.features_file=/nfs/home/schrape/ml_coarsening/configs/data/features/all.txt \
- data.graphs_file=/nfs/home/schrape/ml_coarsening/configs/data/graphs/mss_46_69.txt \
+ data.graphs_file=/nfs/home/schrape/ml_coarsening/configs/data/graphs/mss_1_20.txt \
  paths.log_dir=/nfs/work/students/ml_coarsening/logs/

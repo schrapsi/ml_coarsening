@@ -1,8 +1,8 @@
 #!/bin/bash
 RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
 
-GRAPH_SET=mss_1_20_eval
-MODEL_DIR=2025-06-03_gentle_ostrich_093
+GRAPH_SET=gnn_eval
+MODEL_DIR=2000-01-01_gnn_run_001
 
 cd ~ || exit
 cd mt-kahypar/build/ || exit

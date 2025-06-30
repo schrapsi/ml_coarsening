@@ -2,10 +2,10 @@
 RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
 GRAPHS_DIR=$HOME/ml_coarsening/configs/data/graphs
 
-GRAPH_SET=mss_46_69_eval
-MODEL_DIR=2025-06-24_dynamic_turtle_396
-EPOCH=024
-MODEL_CLASS="MulticlassClassificationModule"
+GRAPH_SET=gnn_eval
+MODEL_DIR=2025-06-03_gentle_ostrich_093
+EPOCH=095
+MODEL_CLASS="MLCoarseningModule"
 
 cd ~ || exit
 cd ml_coarsening || exit
