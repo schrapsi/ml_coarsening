@@ -24,11 +24,10 @@ class GraphPredictionDataModule(LightningDataModule):
         self.features = features if features else []
 
         if graphs_file and Path(graphs_file).exists():
-            print(f"Loading graphs from {graphs_file} into self.graphs")
             with open(graphs_file, 'r') as f:
                 self.graphs = [line.strip() for line in f if line.strip()]
         else:
-            FileNotFoundError(f"Graph file {graphs_file} not found")
+            raise FileNotFoundError(f"Graph file {graphs_file} not found")
 
     def prepare_data(self):
         for graph in self.graphs:
