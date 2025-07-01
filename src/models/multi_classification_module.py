@@ -32,14 +32,6 @@ class MulticlassClassificationModule(LightningModule):
 
         # Multiclass classification loss function
         if class_weights is not None:
-            self.criterion = torch.hub.load(
-            'adeelh/pytorch-multi-class-focal-loss',
-            model='focal_loss',
-            alpha=class_weights,
-            gamma=2,
-            reduction='mean',
-            dtype=torch.float32,
-            force_reload=False)
             self.criterion = WeightedOrdinalMSELoss(class_weights=class_weights, num_classes=num_classes)
         else:
             self.criterion = WeightedOrdinalMSELoss(num_classes=num_classes)

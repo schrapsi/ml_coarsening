@@ -123,18 +123,18 @@ class MulticlassClassificationDataModule(LightningDataModule):
                           random_state=42)
             X_train_resampled, y_train_resampled = smote.fit_resample(X_train_scaled, y_train)
 
-            final_indices = []
-            for class_id in range(self.num_classes):
-                class_indices = np.where(y_train_resampled == class_id)[0]
-                if len(class_indices) > self.class_amount:
-                    selected_indices = np.random.choice(class_indices, self.class_amount, replace=False)
-                    final_indices.append(selected_indices)
-                else:
-                    final_indices.append(class_indices)
+            #final_indices = []
+            #for class_id in range(self.num_classes):
+            #    class_indices = np.where(y_train_resampled == class_id)[0]
+            #    if len(class_indices) > self.class_amount:
+            #        selected_indices = np.random.choice(class_indices, self.class_amount, replace=False)
+            #        final_indices.append(selected_indices)
+            #    else:
+            #        final_indices.append(class_indices)
 
-            final_indices = np.concatenate(final_indices)
-            X_train_resampled = X_train_resampled[final_indices]
-            y_train_resampled = y_train_resampled[final_indices]
+            #final_indices = np.concatenate(final_indices)
+            #X_train_resampled = X_train_resampled[final_indices]
+            #y_train_resampled = y_train_resampled[final_indices]
 
             # Print class distribution after SMOTE
             class_counts_after = np.bincount(y_train_resampled, minlength=self.num_classes)
@@ -157,6 +157,7 @@ class MulticlassClassificationDataModule(LightningDataModule):
                 torch.tensor(X_train_scaled, dtype=torch.float32),
                 torch.tensor(y_train.values, dtype=torch.long)
             )
+
         self.val_dataset = TensorDataset(
             torch.tensor(X_val_scaled, dtype=torch.float32),
             torch.tensor(y_val.values, dtype=torch.long)
