@@ -2,6 +2,7 @@
 
 defaults:
   - data: train_default.yaml # Use your existing data config
+  - paths: default
   - _self_
 
 # Number of top features to select and save

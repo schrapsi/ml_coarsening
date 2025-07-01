@@ -1,13 +1,13 @@
 # src/feature_selection.py
+import logging
 
 import hydra
 import pandas as pd
 from omegaconf import DictConfig
 from sklearn.ensemble import RandomForestRegressor
 
-from src.utils.pylogger import RankedLogger
 
-log = RankedLogger(__name__, rank_zero_only=True)
+log = logging.getLogger(__name__)
 
 
 @hydra.main(version_base=None, config_path="../configs", config_name="feature_selection.yaml")
