@@ -27,15 +27,16 @@ def main(cfg: DictConfig) -> None:
     # This assumes your dataloader yields batches with 'x' (features) and 'y' (target)
     # You might need to adjust this based on your specific DataModule implementation
     train_dataloader = datamodule.train_dataloader()
-    X_list = [batch.x for batch in train_dataloader]
-    y_list = [batch.y for batch in train_dataloader]
+    print(train_dataloader)
+    X_list = train_dataloader.dataset.tensors[0]
+    y_list = train_dataloader.dataset.tensors[1]
 
     # Convert to pandas DataFrame/Series for scikit-learn
-    X = pd.concat([pd.DataFrame(tensor.numpy()) for tensor in X_list], ignore_index=True)
-    y = pd.concat([pd.Series(tensor.numpy().flatten()) for tensor in y_list], ignore_index=True)
+    X = pd.DataFrame(X_list.numpy())
+    y = pd.Series(y_list.numpy().squeeze())
 
     # Load feature names
-    X.columns = datamodule.features.tolist()
+    X.columns = datamodule.features
 
     log.info(f"Training RandomForestRegressor on {len(X)} samples...")
     model = RandomForestRegressor(**cfg.model)
