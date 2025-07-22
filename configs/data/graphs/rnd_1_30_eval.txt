@@ -1,0 +1,10 @@
+wiki-Talk
+soc-Slashdot0811
+rhg18
+as-skitter
+citationCiteseer
+cnr-2000
+er-fact1.5-scale20
+com-lj.ungraph
+kron_g500-simple-logn18
+soc-pokec-relationships
