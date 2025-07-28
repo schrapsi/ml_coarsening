@@ -7,7 +7,7 @@ rsync -avz ./exec_scripts/ schrape@login.ae.iti.kit.edu:/nfs/home/schrape/slurm_
 
 ssh schrape@login.ae.iti.kit.edu << 'EOF'
 SERVER=$(sinfo --Node --partition=all --long --noheader | awk '$1 != "iverson"  && ($4 == "idle" || $4 == "idle~" || $4 == "idle#") {print $1, $5}' | sort -k2 -nr | head -n 1 | awk '{print $1}')
-SCRIPT=run_exp.sh
+SCRIPT=run_exp_wpred.sh
 
 
 
