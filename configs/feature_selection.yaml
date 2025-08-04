@@ -1,0 +1,22 @@
+# configs/feature_selection.yaml
+
+defaults:
+  - data: train_default.yaml # Use your existing data config
+  - paths: default
+  - _self_
+
+# Number of top features to select and save
+top_n: 50
+
+# Path to save the new feature file
+output_path: configs/data/features/top_${top_n}_features.txt
+
+# Parameters for the scikit-learn RandomForestRegressor
+# See scikit-learn documentation for all options
+model:
+  n_estimators: 100
+  max_depth: null
+  min_samples_split: 2
+  min_samples_leaf: 1
+  random_state: 42
+  n_jobs: -1 # Use all available cores

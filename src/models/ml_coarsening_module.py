@@ -1,5 +1,6 @@
 from typing import Any, Dict, Tuple
 
+import hydra
 import torch
 from lightning import LightningModule
 import torchmetrics as tm
@@ -12,7 +13,10 @@ class MLCoarseningModule(LightningModule):
             net: torch.nn.Module,
             optimizer: torch.optim.Optimizer,
             scheduler: torch.optim.lr_scheduler,
+            scaler = None,
+            features = None,
             compile: bool = False,
+
     ) -> None:
         super().__init__()
         self.save_hyperparameters(logger=False, ignore=["net"])
@@ -126,6 +130,34 @@ class MLCoarseningModule(LightningModule):
                 },
             }
         return {"optimizer": optimizer}
+
+    def predict_step(self, batch, batch_idx: int):
+        """
+        batch is a tuple of (ids, features_tensor).
+        We return (ids, raw_output) so downstream we can
+        reconstruct exactly as your loop does today.
+        """
+        ids, features = batch
+        out = self(features)  # -> Tensor [B, 1]
+        return {
+            "ids": ids.cpu().numpy(),  # shape [B, 2]
+            "preds": out.squeeze(dim=-1).cpu().numpy()  # shape [B]
+        }
+    @classmethod
+    def load_from_checkpoint(cls, checkpoint_path, map_location=None, **kwargs):
+        """Override to automatically instantiate the network from saved config."""
+        checkpoint = torch.load(checkpoint_path, map_location=map_location, weights_only=False)
+
+        # If net is not explicitly provided but exists in hyperparameters
+        if 'net' not in kwargs and 'net' in checkpoint['hyper_parameters']:
+            # Create network from saved config
+            kwargs['net'] = hydra.utils.instantiate(checkpoint['hyper_parameters']['net'])
+
+        # Call the parent implementation with the network included
+        return super(MLCoarseningModule, cls).load_from_checkpoint(
+            checkpoint_path, map_location=map_location, **kwargs
+        )
+
 
 if __name__ == "__main__":
     _ = MLCoarseningModule(None, None, None, None)

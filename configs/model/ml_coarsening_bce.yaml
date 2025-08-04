@@ -1,0 +1,28 @@
+_target_: src.models.ml_coarsening_bce_module.MLCoarseningBCEModule
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 0.001
+  weight_decay: 0.0
+
+scheduler:
+  _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+  _partial_: true
+  mode: min
+  factor: 0.1
+  patience: 10
+
+net:
+  _target_: src.models.components.customizable_dense_net.CustomizableDenseNet
+  input_size: 208
+  hidden_sizes:
+    - 512
+    - 256
+    - 128
+    - 64
+  output_size: 1
+  dropout: 0.5
+  with_sigmoid: false
+  with_batch_norm: true
+scaler: null

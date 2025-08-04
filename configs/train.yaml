@@ -1,13 +1,20 @@
+run_name: ${generate_run_name:}
+
 defaults:
   - _self_
-  - data: graph_datamodule/default  # Fixed the path format
+  - data: train_default  # Fixed the path format
   - model: ml_coarsening
   - callbacks: default
   - logger: mlflow  # For experiment tracking
   - trainer: default
   - paths: default
+  - debug: null
+  - hydra: default
+  - experiment: null
 
 train: True
+test: True
+task_name: "train"
 ckpt_path: null
 # Training-specific parameters
 seed: 42
