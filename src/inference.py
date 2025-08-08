@@ -3,6 +3,7 @@ import os
 import shutil
 from pathlib import Path
 from typing import Optional, Tuple, Dict, Any
+import pandas as pd
 
 import torch
 import hydra
@@ -34,12 +35,12 @@ def inference(cfg: DictConfig):
     model_name = model_dir.name[11:]
 
     print(f"Model name: {model_name}")
-    create_experiment_json_file(
-        name=model_name,
-        instance_folder=str(pred_dir),
-        output_path=str(model_dir),
-        graph_set_name=graph_set_name
-    )
+    #create_experiment_json_file(
+    #    name=model_name,
+    #    instance_folder=str(pred_dir),
+    #    output_path=str(model_dir),
+    #    graph_set_name=graph_set_name
+    #)
 
     scaler = model.hparams.scaler
     features = model.hparams.features
@@ -54,6 +55,7 @@ def inference(cfg: DictConfig):
     for graph in dataloaders:
         dl = dataloaders[graph]
         print(f"Predict dataloader: {graph}, with {len(dl.dataset)} samples")
+        inputs_df, pred_df = export_model_data(model, dl, pred_dir, graph, model.hparams.features)
         raw_outputs = trainer.predict(model, dataloaders=dl)
         ids = raw_outputs[0]["ids"]  # shape [B, 2]
         preds = raw_outputs[0]["preds"]
@@ -115,6 +117,60 @@ def load_model(ckpt_path, model_class=None):
     print("Loading MLCoarseningModule from checkpoint")
     return MLCoarseningModule.load_from_checkpoint(ckpt_path, map_location=torch.device("cpu"))
 
+
+def dataloader_to_df(dataloader, feature_names):
+    """Convert a PyTorch dataloader to a pandas DataFrame with all inputs"""
+    all_features = []
+    all_ids = []
+
+    # Iterate through all batches
+    for batch in dataloader:
+        all_ids.append(batch[0])
+        features = batch[1]
+        all_features.append(features)
+
+    # Concatenate all batches
+    input_matrix = torch.cat(all_features, dim=0).cpu().numpy()
+
+    # Create DataFrame
+    df = pd.DataFrame(input_matrix, columns=[f'{name}' for name in feature_names])
+    return df
+
+
+def export_model_data(model, dataloader, pred_dir, graph_name, features):
+    """Export both input data and model predictions to CSV files"""
+    # Convert dataloader to DataFrame
+    inputs_df = dataloader_to_df(dataloader, features)
+
+    # Get model predictions
+    trainer = Trainer()
+    raw_outputs = trainer.predict(model, dataloader)
+
+
+    # Create predictions DataFrame
+    preds = raw_outputs[0]["preds"]
+    ids = raw_outputs[0]["ids"]
+
+    pred_df = pd.DataFrame({
+        'id_high_degree': ids[:, 0],
+        'id_low_degree': ids[:, 1],
+        'prediction': preds.flatten()
+    })
+
+    # Save to CSV
+    inputs_path = Path(pred_dir) / f"{graph_name}_inputs.csv"
+    preds_path = Path(pred_dir) / f"{graph_name}_predictions.csv"
+    combined_path = Path(pred_dir) / f"{graph_name}_matrix.csv"
+
+    inputs_df.to_csv(inputs_path, index=False)
+    inputs_df["prediction"] = raw_outputs[0]["preds"].flatten()
+    inputs_df.to_csv(combined_path, index=False)
+    pred_df.to_csv(preds_path, index=False)
+
+    print(f"Exported inputs to {inputs_path}")
+    print(f"Exported predictions to {preds_path}")
+
+    return inputs_df, pred_df
 
 @hydra.main(version_base="1.3", config_path="../configs", config_name="inference.yaml")
 def main(cfg: DictConfig) -> Optional[float]:
