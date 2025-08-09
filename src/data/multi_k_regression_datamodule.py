@@ -1,0 +1,131 @@
+from pathlib import Path
+import pandas as pd
+from lightning import LightningDataModule
+from src.utils.data_import import feature_matrix_multi_k
+from torch.utils.data import TensorDataset, DataLoader
+from sklearn.model_selection import train_test_split
+import torch
+
+
+class MultiKRegressionDataModule(LightningDataModule):
+    def __init__(
+        self,
+        data_dir: str,
+        features_file: str = None,
+        graphs_file: str = None,
+        batch_size: int = 32,
+        num_workers: int = 0,
+        train_val_test_split: list[float] = [0.7, 0.15, 0.15],
+        data_amount: int = None,
+        scaler=None,
+    ):
+        super().__init__()
+        self.data_dir = data_dir
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+        self.split = train_val_test_split
+        self.scaler = scaler
+
+        if graphs_file and Path(graphs_file).exists():
+            with open(graphs_file, "r") as f:
+                self.graphs = [line.strip() for line in f if line.strip()]
+        else:
+            raise FileNotFoundError(f"Graph file {graphs_file} not found")
+
+        if features_file and Path(features_file).exists():
+            with open(features_file, "r") as f:
+                self.features = [line.strip() for line in f if line.strip()]
+        else:
+            raise FileNotFoundError(f"Features file {features_file} not found")
+
+        amount_per_graph = data_amount // len(self.graphs) if data_amount else None
+        self.data_amount = amount_per_graph
+
+    def prepare_data(self):
+        for graph in self.graphs:
+            full_path = Path(self.data_dir) / graph
+            if not full_path.exists():
+                raise FileNotFoundError(f"Graph directory {full_path} not found")
+
+    def setup(self, stage=None):
+        combined = pd.DataFrame()
+
+        for graph in self.graphs:
+            graph_path = str(Path(self.data_dir) / graph / "") + "/"
+            fm = feature_matrix_multi_k(graph_path, self.data_amount)
+
+            if self.features:
+                if "k_value" not in self.features:
+                    self.features.append("k_value")
+                keep_cols = self.features + ["frequency"]
+                keep_cols = [col for col in keep_cols if col in fm.columns]
+                fm = fm[keep_cols]
+
+            combined = pd.concat([combined, fm], axis=0, ignore_index=True)
+
+        labels = combined["frequency"]
+        X = combined.drop("frequency", axis=1)
+
+        train_frac, val_frac, test_frac = self.split
+        assert abs(train_frac + val_frac + test_frac - 1.0) < 1e-6, "Splits must sum to 1."
+
+        train_idx, temp_idx = train_test_split(
+            range(len(X)), test_size=(val_frac + test_frac), random_state=42
+        )
+        val_idx, test_idx = train_test_split(
+            temp_idx, test_size=test_frac / (val_frac + test_frac), random_state=42
+        )
+
+        X_train, y_train = X.iloc[train_idx], labels.iloc[train_idx]
+        X_val, y_val = X.iloc[val_idx], labels.iloc[val_idx]
+        X_test, y_test = X.iloc[test_idx], labels.iloc[test_idx]
+
+        self.scaler.fit(X_train)
+        X_train_scaled = self.scaler.transform(X_train)
+        X_val_scaled = self.scaler.transform(X_val)
+        X_test_scaled = self.scaler.transform(X_test)
+
+        self.train_dataset = TensorDataset(
+            torch.tensor(X_train_scaled, dtype=torch.float32),
+            torch.tensor(y_train.values, dtype=torch.float32).unsqueeze(1),
+        )
+        self.val_dataset = TensorDataset(
+            torch.tensor(X_val_scaled, dtype=torch.float32),
+            torch.tensor(y_val.values, dtype=torch.float32).unsqueeze(1),
+        )
+        self.test_dataset = TensorDataset(
+            torch.tensor(X_test_scaled, dtype=torch.float32),
+            torch.tensor(y_test.values, dtype=torch.float32).unsqueeze(1),
+        )
+
+    def train_dataloader(self):
+        return DataLoader(
+            self.train_dataset,
+            batch_size=self.batch_size,
+            shuffle=True,
+            num_workers=self.num_workers,
+        )
+
+    def val_dataloader(self):
+        return DataLoader(
+            self.val_dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+        )
+
+    def test_dataloader(self):
+        return DataLoader(
+            self.test_dataset,
+            batch_size=self.batch_size,
+            shuffle=False,
+            num_workers=self.num_workers,
+        )
+
+    def get_feature_count(self):
+        if self.features:
+            return len(self.features)
+        else:
+            raise ValueError("Features not specified or not found in the dataset.")
+
+
