@@ -1,4 +1,4 @@
-_target_: src.data.graph_datamodule.MultiKRegressionDataModule
+_target_: src.data.multi_k_regression_datamodule.MultiKRegressionDataModule
 data_dir: /nfs/work/graph_benchmark_sets/ml_coarsening/extended_set/
 features_file: ${paths.root_dir}/configs/data/features/all.txt
 graphs_file: ${paths.root_dir}/configs/data/graphs/all.txt
