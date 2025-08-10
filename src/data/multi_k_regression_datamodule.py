@@ -35,6 +35,7 @@ class MultiKRegressionDataModule(LightningDataModule):
         if features_file and Path(features_file).exists():
             with open(features_file, "r") as f:
                 self.features = [line.strip() for line in f if line.strip()]
+                self.features.append("k_value")
         else:
             raise FileNotFoundError(f"Features file {features_file} not found")
 
