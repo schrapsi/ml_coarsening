@@ -1,5 +1,6 @@
 # src/feature_selection.py
 import logging
+import os
 
 import hydra
 import pandas as pd
@@ -50,11 +51,14 @@ def main(cfg: DictConfig) -> None:
 
     # Save the top N features to a new file
     top_n = cfg.get("top_n", 50)
-    output_path = cfg.get("output_path", f"configs/data/features/top_{top_n}_features.txt")
+    output_path = cfg.get("output_path")
+    features_filename = os.path.splitext(os.path.basename(cfg.get("data.features_file")))[0]
+    file_name = f"top_{top_n}_features_of_{features_filename}.txt"
+    path = output_path + "/" + file_name
 
-    log.info(f"Saving top {top_n} features to '{output_path}'...")
+    log.info(f"Saving top {top_n} features to '{path}'...")
     ranked_features.head(top_n).index.to_series().to_csv(
-        output_path, index=False, header=False
+        path, index=False, header=False
     )
     log.info("Feature selection finished.")
 
