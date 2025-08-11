@@ -53,7 +53,8 @@ def main(cfg: DictConfig) -> None:
     top_n = cfg.get("top_n", 50)
     output_path = cfg.get("output_path")
     features_filename = os.path.splitext(os.path.basename(cfg.get("data.features_file")))[0]
-    file_name = f"top_{top_n}_features_of_{features_filename}.txt"
+    graph_filename = os.path.splitext(os.path.basename(cfg.get("data.graphs_file")))[0]
+    file_name = f"top_{top_n}_features_of_{features_filename}_for_{graph_filename}.txt"
     path = output_path + "/" + file_name
 
     log.info(f"Saving top {top_n} features to '{path}'...")
