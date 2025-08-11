@@ -91,10 +91,15 @@ def feature_matrix_n_performance(path, amount=None, with_id=False, balanced=Fals
     # 3. Read data with optimized parameters
     global_f = pd.read_csv(path + "global.csv")
 
-    if amount is None:
-        edges = pd.read_csv(path + "edges_shuf.csv", dtype=edge_dtypes)
+    if Path.exists(Path(path + "edges_shuf.csv")):
+        edge_file = path + "edges_shuf.csv"
     else:
-        edges = pd.read_csv(path + "edges_shuf.csv", nrows=int(amount), dtype=edge_dtypes)
+        edge_file = path + "edges.csv" # Fallback to edges.csv if edges_shuf.csv does not exist
+
+    if amount is None:
+        edges = pd.read_csv(edge_file, dtype=edge_dtypes)
+    else:
+        edges = pd.read_csv(edge_file, nrows=int(amount), dtype=edge_dtypes)
 
     # 4. Create indexes before merging for better performance
     nodes = pd.read_csv(path + "nodes.csv", dtype=node_dtypes)
