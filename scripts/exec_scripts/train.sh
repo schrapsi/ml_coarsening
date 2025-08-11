@@ -14,4 +14,5 @@ srun uv run -m src.train \
  model.optimizer.weight_decay=0.00001 \
  data.features_file=/nfs/home/schrape/ml_coarsening/configs/data/features/top_32_features.txt \
  data.graphs_file=/nfs/home/schrape/ml_coarsening/configs/data/graphs/mss_1_20.txt \
+ data.data_amount=1000000 \
  paths.log_dir=/nfs/work/students/ml_coarsening/logs/
