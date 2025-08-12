@@ -56,7 +56,9 @@ class GraphDataModule(LightningDataModule):
                 full_path = Path(data_dir) / graph
                 if full_path.exists():
                     found = True
-                    self.graph_paths.append(str(full_path / "") + "/")
+                    path = str(full_path / "") + "/"
+                    if path not in self.graph_paths:
+                        self.graph_paths.append(path)
                     break
             if not found:
                 raise FileNotFoundError(f"Graph directory {full_path} not found")
