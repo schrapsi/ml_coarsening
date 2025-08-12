@@ -18,7 +18,7 @@ class GraphDataModule(LightningDataModule):
             features_file: str = None,
             graphs_file: str = None,
             batch_size: int = 32,
-            num_workers: int = 0,
+            num_workers: int = 8,
             train_val_test_split: list[float] = [0.7, 0.15, 0.15],
             data_amount: int = None,
             scaler=None,
@@ -34,13 +34,13 @@ class GraphDataModule(LightningDataModule):
             with open(graphs_file, 'r') as f:
                 self.graphs = [line.strip() for line in f if line.strip()]
         else:
-            FileNotFoundError(f"Graph file {graphs_file} not found")
+            raise FileNotFoundError(f"Graph file {graphs_file} not found")
 
         if features_file and Path(features_file).exists():
             with open(features_file, 'r') as f:
                 self.features = [line.strip() for line in f if line.strip()]
         else:
-            FileNotFoundError(f"Features file {features_file} not found")
+            raise FileNotFoundError(f"Features file {features_file} not found")
 
         amount_per_graph = data_amount // len(self.graphs) if data_amount else None
         self.data_amount = amount_per_graph
@@ -137,7 +137,6 @@ class GraphDataModule(LightningDataModule):
                 torch.tensor(y_test.values, dtype=torch.float32).unsqueeze(1)
             )
 
-
     def train_dataloader(self):
         # Return the train dataloader
         return DataLoader(
@@ -146,7 +145,6 @@ class GraphDataModule(LightningDataModule):
             shuffle=True,
             num_workers=self.num_workers
         )
-
 
     def val_dataloader(self):
         # Return the validation dataloader
@@ -157,7 +155,6 @@ class GraphDataModule(LightningDataModule):
             num_workers=self.num_workers
         )
 
-
     def test_dataloader(self):
         # Return the test dataloader
         return DataLoader(
@@ -166,7 +163,6 @@ class GraphDataModule(LightningDataModule):
             shuffle=False,
             num_workers=self.num_workers
         )
-
 
     def get_feature_count(self):
         # Return the number of features
