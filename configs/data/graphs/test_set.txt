@@ -1,3 +1,5 @@
 wing
 wiki-Vote
-italy.osm
+cant_spmv
+circuit5M
+cnr2000
