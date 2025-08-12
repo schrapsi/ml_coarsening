@@ -155,7 +155,8 @@ class GraphDataModule(LightningDataModule):
             self.train_dataset,
             batch_size=self.batch_size,
             shuffle=True,
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            drop_last=True
         )
 
 
@@ -165,7 +166,8 @@ class GraphDataModule(LightningDataModule):
             self.val_dataset,
             batch_size=self.batch_size,
             shuffle=False,
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            drop_last=True
         )
 
 
@@ -175,7 +177,8 @@ class GraphDataModule(LightningDataModule):
             self.test_dataset,
             batch_size=self.batch_size,
             shuffle=False,
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            drop_last=True
         )
 
 
