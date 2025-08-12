@@ -75,6 +75,7 @@ class GraphDataModule(LightningDataModule):
 
             combined = pd.concat([combined, fm], axis=0, ignore_index=True)
 
+        print(f"Combined Feature Matrix shape: {combined.shape}")
         # 2. Split into train, val, test DataFrames
         train_frac, val_frac, test_frac = self.split
         assert abs(train_frac + val_frac + test_frac - 1.0) < 1e-6, "Splits must sum to 1."
