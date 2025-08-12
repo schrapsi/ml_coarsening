@@ -17,8 +17,12 @@ class GraphPredictionDataModule(LightningDataModule):
                  features=None,
                  ):
         super().__init__()
+        self.graph_path_mapping = None
         self._predict_datasets = None
-        self.data_dir = data_dir
+        if isinstance(data_dir, str):
+            self.data_dir = [data_dir]
+        else:
+            self.data_dir = data_dir
         self.num_workers = num_workers
         self.scaler = scaler
         self.features = features if features else []
@@ -30,18 +34,26 @@ class GraphPredictionDataModule(LightningDataModule):
             raise FileNotFoundError(f"Graph file {graphs_file} not found")
 
     def prepare_data(self):
+        self.graph_path_mapping = {}
+
         for graph in self.graphs:
-            full_path = Path(self.data_dir) / graph
-            if not full_path.exists():
-                raise FileNotFoundError(f"Graph directory {full_path} not found")
+            found = False
+            for data_dir in self.data_dir:
+                full_path = Path(data_dir) / graph
+                if full_path.exists():
+                    found = True
+                    path = str(full_path / "") + "/"
+                    self.graph_path_mapping[graph] = path
+                    break
+            if not found:
+                raise FileNotFoundError(f"Graph directory {path} not found")
 
     def setup(self, stage=None):
         # Go through all graphs in self.graphs and create a DataLoader dictionary with DataLoader
         # for each graph containing the features and labels from the whole graph
         self._predict_datasets = {}
-        for graph in self.graphs:
-            graph_path = str(Path(self.data_dir) / graph / "") + "/"
-            fm = feature_matrix_n_performance(graph_path, with_id=True)
+        for graph, path in self.graph_path_mapping.items():
+            fm = feature_matrix_n_performance(path, with_id=True)
             ids = fm[["id_high_degree", "id_low_degree"]].to_numpy(dtype=int)
             labels = fm[fm.columns[-1]].to_numpy(dtype=float)
             feats = fm.drop(columns=["id_high_degree", "id_low_degree", fm.columns[-1]])
@@ -49,7 +61,6 @@ class GraphPredictionDataModule(LightningDataModule):
             if self.scaler:
                 feats = self.scaler.transform(feats)
 
-            #feats = feats.to_numpy(dtype=float)
             self._predict_datasets[graph] = TensorDataset(
                 torch.tensor(ids, dtype=torch.int64),
                 torch.tensor(feats, dtype=torch.float32),
