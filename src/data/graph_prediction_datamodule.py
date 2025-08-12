@@ -17,7 +17,7 @@ class GraphPredictionDataModule(LightningDataModule):
                  features=None,
                  ):
         super().__init__()
-        self.graph_path_mapping = None
+        self.graph_path_mapping = {}
         self._predict_datasets = None
         if isinstance(data_dir, str):
             self.data_dir = [data_dir]
@@ -34,8 +34,6 @@ class GraphPredictionDataModule(LightningDataModule):
             raise FileNotFoundError(f"Graph file {graphs_file} not found")
 
     def prepare_data(self):
-        self.graph_path_mapping = {}
-
         for graph in self.graphs:
             found = False
             for data_dir in self.data_dir:
