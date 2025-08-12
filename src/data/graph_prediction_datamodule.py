@@ -35,6 +35,7 @@ class GraphPredictionDataModule(LightningDataModule):
 
     def prepare_data(self):
         for graph in self.graphs:
+            print(f"Preparing data for graph: {graph}")
             found = False
             for data_dir in self.data_dir:
                 full_path = Path(data_dir) / graph
@@ -42,6 +43,7 @@ class GraphPredictionDataModule(LightningDataModule):
                     found = True
                     path = str(full_path / "") + "/"
                     self.graph_path_mapping[graph] = path
+                    print(f"Found graph {graph} at {path}")
                     break
             if not found:
                 raise FileNotFoundError(f"Graph directory {path} not found")
