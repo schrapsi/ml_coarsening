@@ -45,6 +45,7 @@ def inference(cfg: DictConfig):
     features = model.hparams.features
     datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data, scaler=scaler, features=features)
 
+    datamodule.prepare_data()
     datamodule.setup(stage="predict")
     print(f"Loaded model from {cfg.ckpt_path}")
 
