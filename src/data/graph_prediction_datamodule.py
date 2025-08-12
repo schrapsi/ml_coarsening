@@ -34,6 +34,8 @@ class GraphPredictionDataModule(LightningDataModule):
             raise FileNotFoundError(f"Graph file {graphs_file} not found")
 
     def prepare_data(self):
+        print("Preparing data for graph prediction...")
+        print(self.graphs)
         for graph in self.graphs:
             print(f"Preparing data for graph: {graph}")
             found = False

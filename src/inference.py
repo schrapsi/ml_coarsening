@@ -49,6 +49,8 @@ def inference(cfg: DictConfig):
     print(f"Loaded model from {cfg.ckpt_path}")
 
     dataloaders = datamodule.predict_dataloader()
+    if not dataloaders:
+        raise ValueError("No dataloaders found for prediction. Check your data configuration.")
     trainer: Trainer = Trainer()
     copy_metis_files(cfg.metis_path, pred_dir, dataloaders.keys())
     for graph in dataloaders:
