@@ -151,10 +151,12 @@ def export_model_data(model, dataloader, pred_dir, graph_name, features):
     preds = raw_outputs[0]["preds"]
     ids = raw_outputs[0]["ids"]
 
+    print(ids.shape)
+
     pred_df = pd.DataFrame({
+        'prediction': preds.flatten(),
         'id_high_degree': ids[:, 0],
-        'id_low_degree': ids[:, 1],
-        'prediction': preds.flatten()
+        'id_low_degree': ids[:, 1]
     })
 
     # Save to CSV
@@ -163,7 +165,7 @@ def export_model_data(model, dataloader, pred_dir, graph_name, features):
     combined_path = Path(pred_dir) / f"{graph_name}_matrix.csv"
 
     inputs_df.to_csv(inputs_path, index=False)
-    inputs_df["prediction"] = raw_outputs[0]["preds"].flatten()
+    inputs_df = pd.concat([inputs_df, pred_df], axis=1)
     inputs_df.to_csv(combined_path, index=False)
     pred_df.to_csv(preds_path, index=False)
 
