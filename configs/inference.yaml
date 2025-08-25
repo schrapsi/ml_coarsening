@@ -7,6 +7,7 @@ defaults:
   - paths: default
   - debug: null
   - hydra: default
+  - experiment: null
 
 task_name: "inference"
 ckpt_path: ${paths.root_dir}/logs/train/runs/2025-05-30_12-17-44/checkpoints/epoch_060.ckpt
