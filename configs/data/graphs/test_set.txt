@@ -1,5 +1,1 @@
 wing
-wiki-Vote
-cant_spmv
-circuit5M
-cnr2000
