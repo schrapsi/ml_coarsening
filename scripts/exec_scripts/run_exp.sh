@@ -1,8 +1,9 @@
 #!/bin/bash
 RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
 
-GRAPH_SET=gnn_eval
-MODEL_DIR=2000-01-01_gnn_run_001
+GRAPH_SET=rnd_combined_eval
+MODEL_DIR=2025-08-22_wonderful_finch_244
+
 
 cd ~ || exit
 cd mt-kahypar/build/ || exit

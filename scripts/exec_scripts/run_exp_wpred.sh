@@ -3,8 +3,8 @@ RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
 GRAPHS_DIR=$HOME/ml_coarsening/configs/data/graphs
 
 GRAPH_SET=rnd_combined_eval
-MODEL_DIR=2025-08-12_balanced_squirrel_629
-EPOCH=055
+MODEL_DIR=2025-08-22_wonderful_finch_244
+EPOCH=085
 MODEL_CLASS="MLCoarseningModule"
 
 cd ~ || exit
