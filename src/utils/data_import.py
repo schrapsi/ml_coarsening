@@ -202,6 +202,7 @@ def feature_matrix_multi_k(path, amount=None, with_id=False) -> DataFrame:
     if amount is None:
         edges = pd.read_csv(path + "edges_shuf.csv", dtype=edge_dtypes)
     else:
+        amount = amount / len(freqk_files)
         edges = pd.read_csv(path + "edges_shuf.csv", nrows=int(amount), dtype=edge_dtypes)
 
     nodes = pd.read_csv(path + "nodes.csv", dtype=node_dtypes)
