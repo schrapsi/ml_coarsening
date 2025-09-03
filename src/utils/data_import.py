@@ -77,13 +77,15 @@ def feature_matrix_n(path, amount=None, with_id=False, balanced=False) -> DataFr
 def feature_matrix_n_performance(path, amount=None, with_id=False, balanced=False) -> DataFrame:
     print("Starting to Parse: ", path)
 
+    #TODO Change default back to freq_all.csv
+    label_file = "freq_balanced.csv" if balanced else "freqk32.csv"
     # 1. Define datatypes for faster CSV reading
     node_dtypes = {'node_id': 'int32'}
     edge_dtypes = {'id_high_degree': 'int32', 'id_low_degree': 'int32'}
     label_dtypes = {'id_high_degree': 'int32', 'id_low_degree': 'int32', 'frequency': 'float32'}
 
     # 2. Read max value from header to avoid reading freq_all.csv twice
-    with open(path + "freq_all.csv", 'r') as f:
+    with open(path + label_file, 'r') as f:
         _ = f.readline()
         second_line = f.readline()
     max_value = int(re.search(r"# max=(\d+)", second_line).group(1))
@@ -106,7 +108,7 @@ def feature_matrix_n_performance(path, amount=None, with_id=False, balanced=Fals
     nodes.set_index('node_id', inplace=True)
 
     # 5. Read labels
-    label_file = "freq_balanced.csv" if balanced else "freq_all.csv"
+
     labels = pd.read_csv(path + label_file, comment='#', dtype=label_dtypes)
 
     # 6. More efficient way to replicate global features
