@@ -84,11 +84,16 @@ def feature_matrix_n_performance(path, amount=None, with_id=False, balanced=Fals
     edge_dtypes = {'id_high_degree': 'int32', 'id_low_degree': 'int32'}
     label_dtypes = {'id_high_degree': 'int32', 'id_low_degree': 'int32', 'frequency': 'float32'}
 
-    # 2. Read max value from header to avoid reading freq_all.csv twice
     with open(path + label_file, 'r') as f:
-        _ = f.readline()
+        first_line = f.readline()
         second_line = f.readline()
-    max_value = int(re.search(r"# max=(\d+)", second_line).group(1))
+    try:
+        max_value = int(re.search(r"# max=(\d+)", first_line).group(1))
+    except AttributeError:
+        try:
+            max_value = int(re.search(r"# max=(\d+)", second_line).group(1))
+        except AttributeError:
+            raise ValueError(f"No max value found in {path+label_file}")
 
     # 3. Read data with optimized parameters
     global_f = pd.read_csv(path + "global.csv")
