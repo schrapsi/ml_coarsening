@@ -78,7 +78,7 @@ def feature_matrix_n_performance(path, amount=None, with_id=False, balanced=Fals
     print("Starting to Parse: ", path)
 
     #TODO Change default back to freq_all.csv
-    label_file = "freq_balanced.csv" if balanced else "freqk4.csv"
+    label_file = "freq_balanced.csv" if balanced else "freqk32.csv"
     # 1. Define datatypes for faster CSV reading
     node_dtypes = {'node_id': 'int32'}
     edge_dtypes = {'id_high_degree': 'int32', 'id_low_degree': 'int32'}
