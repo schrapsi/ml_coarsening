@@ -36,7 +36,7 @@ def setup(cfg):
     copy_metis_files(cfg.metis_path, exp_sets_dir, graph_list)
 
 
-@hydra.main(version_base="1.3", config_path="../configs", config_name="inference.yaml")
+@hydra.main(version_base="1.3", config_path="../../configs", config_name="inference.yaml")
 def main(cfg: DictConfig) -> Optional[float]:
     setup(cfg)
 
