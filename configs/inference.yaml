@@ -10,7 +10,8 @@ defaults:
   - experiment: null
 
 task_name: "inference"
-ckpt_path: ${paths.root_dir}/logs/train/runs/2025-05-30_12-17-44/checkpoints/epoch_060.ckpt
+model_dir: ${paths.root_dir}/logs/train/runs/2025-05-30_12-17-44/
+ckpt_path: ${model_dir}checkpoints/epoch_060.ckpt
 metis_path: /nfs/work/students/ml_coarsening/graph_metis_files/
 model_class: "BinaryClassificationModule"
 # Training-specific parameters
