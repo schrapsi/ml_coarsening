@@ -41,6 +41,7 @@ def main(cfg):
 
 @hydra.main(version_base="1.3", config_path="../configs", config_name="inference.yaml")
 def main(cfg: DictConfig) -> Optional[float]:
+    print("starting main")
     main(cfg)
 
     return None
