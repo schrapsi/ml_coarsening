@@ -6,7 +6,7 @@ from typing import Optional, Tuple, Dict, Any
 from omegaconf import DictConfig
 import hydra
 
-from inference import create_experiment_json_file, copy_metis_files
+from src.inference import copy_metis_files
 
 
 def main(cfg):
