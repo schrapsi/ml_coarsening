@@ -14,7 +14,7 @@ import torch
 class GraphDataModule(LightningDataModule):
     def __init__(
             self,
-            data_dir: str,
+            data_dir,  # Directory containing the graph data either a str or a list of str
             features_file: str = None,
             graphs_file: str = None,
             batch_size: int = 32,
@@ -24,40 +24,50 @@ class GraphDataModule(LightningDataModule):
             scaler=None,
     ):
         super().__init__()
-        self.data_dir = data_dir
+        if isinstance(data_dir, str):
+            self.data_dir = [data_dir]
+        else:
+            self.data_dir = data_dir
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.split = train_val_test_split
         self.scaler = scaler
+        self.graph_paths = []
 
         if graphs_file and Path(graphs_file).exists():
             with open(graphs_file, 'r') as f:
                 self.graphs = [line.strip() for line in f if line.strip()]
         else:
-            FileNotFoundError(f"Graph file {graphs_file} not found")
+            raise FileNotFoundError(f"Graph file {graphs_file} not found")
 
         if features_file and Path(features_file).exists():
             with open(features_file, 'r') as f:
                 self.features = [line.strip() for line in f if line.strip()]
         else:
-            FileNotFoundError(f"Features file {features_file} not found")
+            raise FileNotFoundError(f"Features file {features_file} not found")
 
         amount_per_graph = data_amount // len(self.graphs) if data_amount else None
         self.data_amount = amount_per_graph
 
     def prepare_data(self):
         for graph in self.graphs:
-            full_path = Path(self.data_dir) / graph
-            if not full_path.exists():
+            found = False
+            for data_dir in self.data_dir:
+                full_path = Path(data_dir) / graph
+                if full_path.exists():
+                    found = True
+                    path = str(full_path / "") + "/"
+                    if path not in self.graph_paths:
+                        self.graph_paths.append(path)
+                    break
+            if not found:
                 raise FileNotFoundError(f"Graph directory {full_path} not found")
 
     def setup(self, stage=None):
         combined = pd.DataFrame()
 
-        for graph in self.graphs:
-            graph_path = str(Path(self.data_dir) / graph / "") + "/"
-            fm = feature_matrix_n_performance(graph_path, self.data_amount)
-
+        for path in self.graph_paths:
+            fm = feature_matrix_n_performance(path, self.data_amount)
             # Select only specified features if provided
             if self.features:
                 # Make sure to keep the target column 'frequency'
@@ -67,6 +77,7 @@ class GraphDataModule(LightningDataModule):
 
             combined = pd.concat([combined, fm], axis=0, ignore_index=True)
 
+        print(f"Combined Feature Matrix shape: {combined.shape}")
         # 2. Split into train, val, test DataFrames
         train_frac, val_frac, test_frac = self.split
         assert abs(train_frac + val_frac + test_frac - 1.0) < 1e-6, "Splits must sum to 1."
@@ -144,7 +155,8 @@ class GraphDataModule(LightningDataModule):
             self.train_dataset,
             batch_size=self.batch_size,
             shuffle=True,
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            drop_last=True
         )
 
 
@@ -154,7 +166,8 @@ class GraphDataModule(LightningDataModule):
             self.val_dataset,
             batch_size=self.batch_size,
             shuffle=False,
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            drop_last=True
         )
 
 
@@ -164,7 +177,8 @@ class GraphDataModule(LightningDataModule):
             self.test_dataset,
             batch_size=self.batch_size,
             shuffle=False,
-            num_workers=self.num_workers
+            num_workers=self.num_workers,
+            drop_last=True
         )
 
 

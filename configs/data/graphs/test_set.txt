@@ -1,3 +1,1 @@
 wing
-wiki-Vote
-italy.osm

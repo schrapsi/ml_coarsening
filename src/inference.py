@@ -45,19 +45,31 @@ def inference(cfg: DictConfig):
     features = model.hparams.features
     datamodule: LightningDataModule = hydra.utils.instantiate(cfg.data, scaler=scaler, features=features)
 
+    datamodule.prepare_data()
     datamodule.setup(stage="predict")
     print(f"Loaded model from {cfg.ckpt_path}")
 
     dataloaders = datamodule.predict_dataloader()
+    if not dataloaders:
+        raise ValueError("No dataloaders found for prediction. Check your data configuration.")
     trainer: Trainer = Trainer()
     copy_metis_files(cfg.metis_path, pred_dir, dataloaders.keys())
     for graph in dataloaders:
         dl = dataloaders[graph]
-        print(f"Predict dataloader: {graph}, with {len(dl.dataset)} samples")
-        raw_outputs = trainer.predict(model, dataloaders=dl)
-        ids = raw_outputs[0]["ids"]  # shape [B, 2]
-        preds = raw_outputs[0]["preds"]
-        write_to_file(pred_dir, graph, ids, preds)
+        if isinstance(dl, Dict):
+            for k, dataloader in dl.items():
+                raw_outputs = trainer.predict(model, dataloaders=dataloader)
+                ids = raw_outputs[0]["ids"]
+                preds = raw_outputs[0]["preds"]
+                write_to_file(pred_dir, graph, ids, preds, k)
+
+
+        else:
+            print(f"Predict dataloader: {graph}, with {len(dl.dataset)} samples")
+            raw_outputs = trainer.predict(model, dataloaders=dl)
+            ids = raw_outputs[0]["ids"]  # shape [B, 2]
+            preds = raw_outputs[0]["preds"]
+            write_to_file(pred_dir, graph, ids, preds)
 
 
 def create_experiment_json_file(name: str, instance_folder: str, output_path: str, graph_set_name: str):
@@ -72,8 +84,11 @@ def create_experiment_json_file(name: str, instance_folder: str, output_path: st
     with open(output_path, "w") as file:
         json.dump(data, file, indent=4)
 
-def write_to_file(path, graph_name, ids, preds):
-    out_path = Path(path) / f"{graph_name}.metis.freq.csv"
+def write_to_file(path, graph_name, ids, preds, k=None):
+    if k is not None:
+        out_path = Path(path) / f"{graph_name}.metis.k{k}.freq.csv"
+    else:
+        out_path = Path(path) / f"{graph_name}.metis.freq.csv"
     out_path.parent.mkdir(exist_ok=True, parents=True)
 
     # exactly your old CSV format:

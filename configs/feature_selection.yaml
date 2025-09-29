@@ -9,7 +9,7 @@ defaults:
 top_n: 50
 
 # Path to save the new feature file
-output_path: configs/data/features/top_${top_n}_features.txt
+output_path: configs/data/features/
 
 # Parameters for the scikit-learn RandomForestRegressor
 # See scikit-learn documentation for all options

@@ -1,6 +1,7 @@
-_target_: src.data.graph_prediction_datamodule.GraphPredictionDataModule
+_target_: src.data.multi_k_prediction_datamodule.MultiKPredictionDataModule
 data_dir:
   - /nfs/work/graph_benchmark_sets/ml_coarsening/extended_set/
   - /nfs/work/graph_benchmark_sets/ml_coarsening/more_instances/
 graphs_file: ${paths.root_dir}/configs/data/graphs/mss_1_20_eval.txt
+k_values: [4, 8, 32, 64]
 num_workers: 11

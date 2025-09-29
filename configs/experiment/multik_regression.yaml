@@ -1,0 +1,12 @@
+# @package _global_
+
+defaults:
+  - override /data: multi_k
+  - override /model: ml_coarsening
+  - override /callbacks: default
+  - override /trainer: default
+
+
+data:
+  graphs_file: ${paths.root_dir}/configs/data/graphs/mss_1_20.txt
+  features_file: ${paths.root_dir}/configs/data/features/cost_0.txt
