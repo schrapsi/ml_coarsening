@@ -14,8 +14,11 @@ def main(cfg):
     graph_set_name = graphs_file.stem
 
     model_dir = Path(cfg.model_dir)
+    print(f"Model directory: {model_dir}")
     exp_sets_dir = Path(model_dir) / "experiment_sets" / graph_set_name
+    print(f"Experiment sets directory: {exp_sets_dir}")
     exp_sets_dir.mkdir(exist_ok=True, parents=True)
+    print(f"Created experiment sets directory at: {exp_sets_dir}")
 
     model_name = model_dir.name[11:]
     file_path = "/nfs/home/schrape/ml_inside.json"
