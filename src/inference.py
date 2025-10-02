@@ -50,6 +50,8 @@ def inference(cfg: DictConfig):
     print(f"Loaded model from {cfg.ckpt_path}")
 
     dataloaders = datamodule.predict_dataloader()
+    exit()
+
     if not dataloaders:
         raise ValueError("No dataloaders found for prediction. Check your data configuration.")
     trainer: Trainer = Trainer()

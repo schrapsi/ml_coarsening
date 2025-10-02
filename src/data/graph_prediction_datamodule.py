@@ -60,8 +60,12 @@ class GraphPredictionDataModule(LightningDataModule):
             labels = fm[fm.columns[-1]].to_numpy(dtype=float)
             feats = fm.drop(columns=["id_high_degree", "id_low_degree", fm.columns[-1]])
             feats = feats[self.features]
+            feats_wid = fm
             if self.scaler:
                 feats = self.scaler.transform(feats)
+                feats_wid = self.scaler.transform(fm)
+
+            feats_wid.to_csv(f"/nfs/work/students/schrape/mt_kahypar_output/{graph}_scaled_features.csv", index=False)
 
             self._predict_datasets[graph] = TensorDataset(
                 torch.tensor(ids, dtype=torch.int64),
