@@ -6,6 +6,7 @@ from torch.utils.data import TensorDataset
 
 from src.utils.data_import import feature_matrix_n_performance
 from torch.utils.data import DataLoader
+import pandas as pd
 
 
 class GraphPredictionDataModule(LightningDataModule):
@@ -63,9 +64,8 @@ class GraphPredictionDataModule(LightningDataModule):
             feats_wid = fm
             if self.scaler:
                 feats = self.scaler.transform(feats)
-                feats_wid = self.scaler.transform(fm)
-
-            feats_wid.to_csv(f"/nfs/work/students/schrape/mt_kahypar_output/{graph}_scaled_features.csv", index=False)
+            ids_df = pd.DataFrame(ids, columns=["id_high_degree", "id_low_degree"])
+            pd.concat([ids_df, feats], axis=1).to_csv(f"/nfs/work/students/schrape/mt_kahypar_output/{graph}_scaled_features.csv", index=False)
 
             self._predict_datasets[graph] = TensorDataset(
                 torch.tensor(ids, dtype=torch.int64),

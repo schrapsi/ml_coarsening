@@ -2,9 +2,9 @@
 RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
 GRAPHS_DIR=$HOME/ml_coarsening/configs/data/graphs
 
-GRAPH_SET=extended_large_mss_eval_complement
-MODEL_DIR=2025-09-01_sincere_duck_934
-EPOCH=023
+GRAPH_SET=mss_1_20_eval
+MODEL_DIR=2025-07-07_energetic_macaw_346
+EPOCH=067
 MODEL_CLASS="MLCoarseningModule"
 
 cd ~ || exit
@@ -16,6 +16,8 @@ HYDRA_FULL_ERROR=1 srun uv run -m src.inference \
   ckpt_path=$RUNS_DIR/$MODEL_DIR/checkpoints/epoch_$EPOCH.ckpt \
   data.graphs_file=$GRAPHS_DIR/$GRAPH_SET.txt \
   model_class=$MODEL_CLASS
+
+exit
 
 echo "====================="
 echo "graph predictions done"
