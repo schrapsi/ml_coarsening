@@ -1,7 +1,7 @@
 # configs/feature_selection.yaml
 
 defaults:
-  - data: train_default.yaml # Use your existing data config
+  - data: train_default
   - paths: default
   - _self_
 
