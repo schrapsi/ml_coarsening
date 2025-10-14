@@ -22,6 +22,7 @@ def main(cfg: DictConfig) -> None:
     """
     log.info("Instantiating datamodule...")
     datamodule = hydra.utils.instantiate(cfg.data)
+    datamodule.prepare_data()
     datamodule.setup()
 
     log.info("Loading and concatenating training data...")
