@@ -3,8 +3,8 @@ RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
 GRAPHS_DIR=$HOME/ml_coarsening/configs/data/graphs
 
 
-GRAPH_SET=mss_1_20_eval
-MODEL_DIR=energetic_macaw_in
+GRAPH_SET=all
+MODEL_DIR=2000-01-01_energetic_macaw_in
 
 
 cd ~ || exit
@@ -29,7 +29,7 @@ echo "===================="
 echo "building file done"
 echo "===================="
 
-EXP_JSON=$RUNS_DIR/$MODEL_DIR/exp_sets/${GRAPH_SET}_experiment.json
+EXP_JSON=$RUNS_DIR/$MODEL_DIR/experiment_sets/${GRAPH_SET}_experiment.json
 
 cd ~ || exit
 spack env activate test
