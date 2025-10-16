@@ -14,7 +14,10 @@ def setup(cfg):
     graph_set_name = graphs_file.stem
 
     model_dir = Path(cfg.model_dir)
-    exp_sets_dir = Path(model_dir) / "experiment_sets" / graph_set_name
+    output_dir = model_dir / "experiment_sets"
+    output_dir.mkdir(exist_ok=True, parents=True)
+
+    exp_sets_dir = output_dir / graph_set_name
     exp_sets_dir.mkdir(exist_ok=True, parents=True)
 
     model_name = model_dir.name[11:]
@@ -25,7 +28,7 @@ def setup(cfg):
     data["name"] = model_name
     data["graph_instance_folder"] = str(exp_sets_dir)
 
-    output_path = Path(str(model_dir)) / f"experiment_sets/{graph_set_name}_experiment.json"
+    output_path = output_dir / f"{graph_set_name}_experiment.json"
     with open(output_path, "w") as file:
         json.dump(data, file, indent=4)
 
