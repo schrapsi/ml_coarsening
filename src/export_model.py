@@ -37,12 +37,13 @@ def export_model_parameters_as_text(model, output_path: Path, scaler=None):
     # Write to file in the requested format
     param_file = output_path / 'model_parameters.txt'
     with open(param_file, "w") as f:
-        # First line: total number of parameters
-        #f.write(f"{param_vector.size(0)}\n")
-
-        # Remaining lines: one parameter value per line
-        for p in param_vector:
-            f.write(f"{p.item()}\n")
+        f.write("{")
+        for i, p in enumerate(param_vector):
+            f.write(f"{p.item()}")
+            if i < len(param_vector) - 1:
+                f.write(",")
+        f.write("\n")
+        f.write("};")
 
     print(f"Exported {param_vector.size(0)} model parameters to {param_file}")
 
@@ -137,17 +138,7 @@ def export_model_components(ckpt_path: str, model_class: str, output_dir: str) -
         if isinstance(value, torch.Tensor):
             model_weights[key] = value.cpu().numpy()
 
-    # Save model weights
-    np.savez(output_path / 'model_weights.npz', **model_weights)
-
-    # Export scaler if available
-
     if scaler is not None:
-        # Save full scaler object
-        with open(output_path / 'scaler.pkl', 'wb') as f:
-            pickle.dump(scaler, f)
-
-        # Export scaler parameters as numpy arrays
         export_scaler_params(scaler, output_path)
 
     # Export features
@@ -155,11 +146,7 @@ def export_model_components(ckpt_path: str, model_class: str, output_dir: str) -
     if features is not None:
         np.savetxt(output_path / 'features.txt', features, fmt='%s')
 
-    # Export hyperparameters
     hyperparams = dict(model.hparams)
-    with open(output_path / 'hyperparameters.pkl', 'wb') as f:
-        pickle.dump(hyperparams, f)
-
     print(f"Exported components to {output_path}")
     print(f"Model weights shape: {len(model_weights)} parameters")
     print(f"Features: {len(features) if features is not None else 'None'}")
@@ -173,20 +160,11 @@ def export_scaler_params(scaler, output_path: Path):
 
     if hasattr(scaler, 'mean_'):
         scaler_params['mean'] = scaler.mean_
-    if hasattr(scaler, 'scale_'):
-        scaler_params['scale'] = scaler.scale_
     if hasattr(scaler, 'var_'):
         scaler_params['var'] = scaler.var_
-    if hasattr(scaler, 'min_'):
-        scaler_params['min'] = scaler.min_
-    if hasattr(scaler, 'max_'):
-        scaler_params['max'] = scaler.max_
 
     # Save as numpy archive
     if scaler_params:
-        np.savez(output_path / 'scaler_params.npz', **scaler_params)
-
-        # Save as individual text files for easy inspection
         for key, value in scaler_params.items():
             np.savetxt(output_path / f'scaler_{key}.txt', value)
 
