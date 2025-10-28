@@ -1,9 +1,10 @@
 #!/bin/bash
 RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
 GRAPHS_DIR=$HOME/ml_coarsening/configs/data/graphs
+TODAY_DATE=$(date +"%Y-%-m-%-d")
 
 
-GRAPH_SET=all
+GRAPH_SET=mss_1_20_eval
 MODEL_DIR=2000-01-01_energetic_macaw_in
 
 
@@ -11,6 +12,7 @@ cd ~ || exit
 cd ml_coarsening || exit
 spack env activate ml_coarsening
 source .venv/bin/activate
+git checkout feat/new-inference
 git pull
 HYDRA_FULL_ERROR=1 srun uv run -m src.utils.direct_inference_setup \
   model_dir=$RUNS_DIR/$MODEL_DIR/ \
@@ -44,7 +46,6 @@ echo "experiments completed"
 echo "===================="
 
 
-TODAY_DATE=$(date +"%Y-%-m-%-d")
 MODEL_NAME=${MODEL_DIR#*_}
 RESULTS_DIR="$HOME/hypergraph_partitioner/experiments/${TODAY_DATE}_${MODEL_NAME}"
 
@@ -53,8 +54,9 @@ DEST_DIR="$RUNS_DIR/$MODEL_DIR/exp_results"
 
 mkdir -p "$DEST_DIR"
 
-cp "$RESULTS_DIR/mt_kahypar_ml.csv" "$DEST_DIR/${MODEL_NAME}-${GRAPH_SET}.csv"
-cp "$RESULTS_DIR/mt_kahypar_ml_constrained.csv" "$DEST_DIR/${MODEL_NAME}-${GRAPH_SET}-c.csv"
+cp "$RESULTS_DIR/ml_inside_uc.csv" "$DEST_DIR/${MODEL_NAME}-${GRAPH_SET}.csv"
+cp "$RESULTS_DIR/ml_inside_c.csv" "$DEST_DIR/${MODEL_NAME}-${GRAPH_SET}-c.csv"
+cp "$RESULTS_DIR/ml_inside_lp.csv" "$DEST_DIR/${MODEL_NAME}-${GRAPH_SET}-lp.csv"
 
 echo "===================="
 echo "results copied to $DEST_DIR"
