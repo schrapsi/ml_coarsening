@@ -41,7 +41,7 @@ def export_model_parameters_as_text(model, output_path: Path, scaler=None):
         for i, p in enumerate(param_vector):
             f.write(f"{p.item()}")
             if i < len(param_vector) - 1:
-                f.write(",")
+                f.write(", ")
         f.write("\n")
         f.write("};")
 
