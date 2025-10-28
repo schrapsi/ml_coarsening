@@ -154,16 +154,20 @@ def export_model_components(ckpt_path: str, model_class: str, output_dir: str) -
 
     return model_weights, hyperparams
 
+
 def export_scaler_params(scaler, output_path: Path):
     """Export scaler parameters as separate numpy files"""
     scaler_params = {}
 
     if hasattr(scaler, 'mean_'):
-        scaler_params['mean'] = scaler.mean_
-    if hasattr(scaler, 'var_'):
-        scaler_params['var'] = scaler.var_
+        scaler_params['means'] = scaler.mean_
 
-    # Save as numpy archive
+    if hasattr(scaler, 'scale_'):
+        scaler_params['stdevs'] = scaler.scale_
+    elif hasattr(scaler, 'var_'):
+        scaler_params['stdevs'] = np.sqrt(scaler.var_)
+
+    # Save as text files for C++
     if scaler_params:
         for key, value in scaler_params.items():
             np.savetxt(output_path / f'scaler_{key}.txt', value)
