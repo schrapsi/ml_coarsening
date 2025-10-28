@@ -5,7 +5,8 @@ TODAY_DATE=$(date +"%Y-%-m-%-d")
 
 
 GRAPH_SET=mss_1_20_eval
-MODEL_DIR=2000-01-01_energetic_macaw_in
+MODEL_DIR=2000-01-01_loving_chipmunk_in
+MODEL_BRANCH=cheap_model
 
 
 cd ~ || exit
@@ -21,6 +22,7 @@ HYDRA_FULL_ERROR=1 srun uv run -m src.utils.direct_inference_setup \
 
 cd ~ || exit
 cd mt-kahypar/build/ || exit
+git checkout simeon/$MODEL_BRANCH
 spack env activate kahypar
 cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 make clean
