@@ -26,7 +26,7 @@ def setup(cfg):
         data = json.load(file)
 
     for algo in data["config"]:
-        algo["args"] = str(cfg.inference.get("flags"))
+        algo["args"] = str(cfg.get("flags"))
     data["name"] = model_name
     data["graph_instance_folder"] = str(exp_sets_dir)
 
