@@ -4,7 +4,7 @@ GRAPHS_DIR=$HOME/ml_coarsening/configs/data/graphs
 TODAY_DATE=$(date +"%Y-%-m-%-d")
 
 
-GRAPH_SET=mss_1_20_eval
+GRAPH_SET=all
 MODEL_DIR=2000-01-01_loving_chipmunk_in
 MODEL_BRANCH=cheap_model
 
@@ -18,7 +18,9 @@ git pull
 HYDRA_FULL_ERROR=1 srun uv run -m src.utils.direct_inference_setup \
   model_dir=$RUNS_DIR/$MODEL_DIR/ \
   data.graphs_file=$GRAPHS_DIR/$GRAPH_SET.txt \
+  flags="--c-guided-coarsening-levels=1"
 
+exit
 
 cd ~ || exit
 cd mt-kahypar/build/ || exit
