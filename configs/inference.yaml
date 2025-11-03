@@ -14,7 +14,7 @@ model_dir: ${paths.root_dir}/logs/train/runs/2025-05-30_12-17-44/
 ckpt_path: ${model_dir}checkpoints/epoch_060.ckpt
 metis_path: /nfs/work/students/ml_coarsening/graph_metis_files/
 model_class: "BinaryClassificationModule"
-flags: ""
+flags: "--c-guided-coarsening-levels=1"
 # Training-specific parameters
 seed: 42
 
