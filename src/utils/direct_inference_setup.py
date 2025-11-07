@@ -38,7 +38,7 @@ def setup(cfg):
     if graphs_file and Path(graphs_file).exists():
         with open(graphs_file, 'r') as f:
             graph_list = [line.strip() for line in f if line.strip()]
-    copy_metis_files(cfg.metis_path, exp_sets_dir, graph_list)
+    copy_metis_files(cfg.data.data_dir, exp_sets_dir, graph_list)
 
 
 @hydra.main(version_base="1.3", config_path="../../configs", config_name="inference.yaml")

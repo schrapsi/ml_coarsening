@@ -53,7 +53,7 @@ def inference(cfg: DictConfig):
     if not dataloaders:
         raise ValueError("No dataloaders found for prediction. Check your data configuration.")
     trainer: Trainer = Trainer()
-    copy_metis_files(cfg.metis_path, pred_dir, dataloaders.keys())
+    copy_metis_files(cfg.data.data_dir, pred_dir, dataloaders.keys())
     for graph in dataloaders:
         dl = dataloaders[graph]
         if isinstance(dl, Dict):
@@ -101,18 +101,25 @@ def write_to_file(path, graph_name, ids, preds, k=None):
     print(f"Wrote {out_path}")
 
 
-def copy_metis_files(src_folder, dest_folder, graph_set):
-    # Iterate through files in the source folder
+def copy_metis_files(src_folders, dest_folder, graph_set):
+    print("Preparing data for graph prediction...")
+
     for graph in graph_set:
         filename = graph + ".metis"
-        src_path = os.path.join(src_folder, filename)
-        dest_path = os.path.join(dest_folder, filename)
+        found = False
 
-        if os.path.isfile(src_path):
-            shutil.copy2(src_path, dest_path)  # copy2 preserves metadata
-            print(f"Copied: {src_path} -> {dest_path}")
-        else:
-            print(f"File not found: {src_path}, skipping copy.")
+        # Search for the file in all source folders
+        for src_folder in src_folders:
+            src_path = os.path.join(src_folder, filename)
+            if Path(src_path).exists():
+                dest_path = os.path.join(dest_folder, filename)
+                shutil.copy2(src_path, dest_path)  # copy2 preserves metadata
+                print(f"Copied: {src_path} -> {dest_path}")
+                found = True
+                break
+
+        if not found:
+            raise FileNotFoundError(f"Graph file {filename} not found in any of the source directories: {src_folders}")
 
 
 def load_model(ckpt_path, model_class=None):
