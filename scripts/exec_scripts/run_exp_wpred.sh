@@ -2,9 +2,9 @@
 RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
 GRAPHS_DIR=$HOME/ml_coarsening/configs/data/graphs
 
-GRAPH_SET=extended_large_mss_eval_complement
-MODEL_DIR=2025-09-01_sincere_duck_934
-EPOCH=023
+GRAPH_SET=mss_1_20_eval
+MODEL_DIR=2025-11-09_kind_beaver_587
+EPOCH=022
 MODEL_CLASS="MLCoarseningModule"
 
 cd ~ || exit
@@ -23,6 +23,7 @@ echo "====================="
 
 cd ~ || exit
 cd mt-kahypar/build/ || exit
+git checkout nikolai/guided-coarsening
 spack env activate kahypar
 cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 make clean
