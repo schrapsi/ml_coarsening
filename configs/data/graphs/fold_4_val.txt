@@ -1,0 +1,15 @@
+smallworld
+bn-human-Jung2015_M87123142
+roadNet-TX
+com-lj.ungraph
+144
+superblue11
+hugetrace-00000
+p2p-Gnutella04
+eswiki-2013
+Hook_1498
+citationCiteseer
+fe_sphere
+cond-mat-2003
+wing_nodal
+hugebubbles-00000

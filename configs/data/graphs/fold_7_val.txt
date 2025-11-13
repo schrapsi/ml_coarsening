@@ -1,0 +1,14 @@
+dewiki-2013
+web-Stanford
+eu-2005
+er-fact1.5-scale20
+ba_2_22_s0_md_2
+bcsstk29
+loc-gowalla_edges
+rmat_a60_b21_c16_n15_d48
+superblue14
+italy.osm
+rmat_n16_m23
+finan512
+G3_circuit
+soc-flickr-und
