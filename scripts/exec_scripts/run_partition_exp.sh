@@ -4,8 +4,8 @@ GRAPHS_DIR=$HOME/ml_coarsening/configs/data/graphs
 TODAY_DATE=$(date +"%Y-%-m-%-d")
 
 
-GRAPH_SET=ufm_regular
-MODEL_DIR=2000-01-01_loving_chipmunk_in
+GRAPH_SET=mss_1_20_eval
+MODEL_DIR=2000-01-01_loving_chipmunk_in_lv1
 MODEL_BRANCH=cheap_model
 
 
@@ -18,7 +18,7 @@ git pull
 HYDRA_FULL_ERROR=1 srun uv run -m src.utils.direct_inference_setup \
   model_dir=$RUNS_DIR/$MODEL_DIR/ \
   data.graphs_file=$GRAPHS_DIR/$GRAPH_SET.txt \
-#  'flags="--c-guided-subrounds=2 --c-guiding-threshold=0.4"'
+  'flags="--c-guided-coarsening-levels=1"'
 
 
 
