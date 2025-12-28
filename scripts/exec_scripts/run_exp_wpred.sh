@@ -2,9 +2,9 @@
 RUNS_DIR=/nfs/work/students/ml_coarsening/logs/train/runs
 GRAPHS_DIR=$HOME/ml_coarsening/configs/data/graphs
 
-GRAPH_SET=mss_21_45
-MODEL_DIR=2025-10-18_loving_chipmunk_692
-EPOCH=021
+GRAPH_SET=fold_7_val
+MODEL_DIR=2025-11-13_fold_7_model
+EPOCH=050
 MODEL_CLASS="MLCoarseningModule"
 
 cd ~ || exit
