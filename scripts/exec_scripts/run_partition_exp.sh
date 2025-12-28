@@ -5,8 +5,8 @@ TODAY_DATE=$(date +"%Y-%-m-%-d")
 
 
 GRAPH_SET=mss_1_20_eval
-MODEL_DIR=2000-01-01_loving_chipmunk_in_lv1
-MODEL_BRANCH=cheap_model
+MODEL_DIR=2000-01-01_ml_clustering_light
+MODEL_BRANCH=cheap-model-fix
 
 
 cd ~ || exit
@@ -17,14 +17,13 @@ git checkout feat/new-inference
 git pull
 HYDRA_FULL_ERROR=1 srun uv run -m src.utils.direct_inference_setup \
   model_dir=$RUNS_DIR/$MODEL_DIR/ \
-  data.graphs_file=$GRAPHS_DIR/$GRAPH_SET.txt \
-  'flags="--c-guided-coarsening-levels=1"'
+  data.graphs_file=$GRAPHS_DIR/$GRAPH_SET.txt
 
 
 
 cd ~ || exit
 cd mt-kahypar/build/ || exit
-git checkout simeon/$MODEL_BRANCH
+git checkout nikolai/$MODEL_BRANCH
 spack env activate kahypar
 cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 make clean
