@@ -24,7 +24,7 @@ echo "====================="
 
 cd ~ || exit
 cd mt-kahypar/build/ || exit
-git checkout nikolai/guided-coarsening
+git checkout nikolai/ml-graph-stats
 spack env activate kahypar
 cmake .. -DCMAKE_BUILD_TYPE=RELEASE
 make clean
