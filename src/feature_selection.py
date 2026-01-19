@@ -58,10 +58,24 @@ def main(cfg: DictConfig) -> None:
     file_name = f"top_{top_n}_features_of_{features_filename}_for_{graph_filename}.txt"
     path = output_path + "/" + file_name
 
-    log.info(f"Saving top {top_n} features to '{path}'...")
-    ranked_features.head(top_n).index.to_series().to_csv(
-        path, index=False, header=False
-    )
+    existing_features = []
+    if os.path.exists(path):
+        with open(path, "r") as f:
+            existing_features = [line.strip() for line in f if line.strip()]
+
+        top_n_features = ranked_features.head(top_n).index.to_series()
+        if set(top_n_features) == set(existing_features):
+            log.info("The Same features as the existing ones are the output again")
+            log.info("Not saving features again")
+        else:
+            i = 1
+            while os.path.exists(path):
+                path = path + f"-{i}"
+                i += 1
+
+            log.info(f"Saving top {top_n} features to '{path}'...")
+            top_n_features.to_csv(path, index=False, header=False)
+
     log.info("Feature selection finished.")
 
 
