@@ -56,10 +56,11 @@ def main(cfg: DictConfig) -> None:
     features_filename = os.path.splitext(os.path.basename(cfg.data.features_file))[0]
     graph_filename = os.path.splitext(os.path.basename(cfg.data.graphs_file))[0]
     file_name = f"top_{top_n}_features_of_{features_filename}_for_{graph_filename}.txt"
-    path = output_path + "/" + file_name
+    path = output_path  + file_name
 
     existing_features = []
     if os.path.exists(path):
+        log.info(f"Warning: The file '{path}' already exists.")
         with open(path, "r") as f:
             existing_features = [line.strip() for line in f if line.strip()]
 
@@ -69,13 +70,19 @@ def main(cfg: DictConfig) -> None:
             log.info("Not saving features again")
         else:
             i = 1
-            while os.path.exists(path):
-                path = path + f"-{i}"
+            while True:
+                print(i)
+                new_path = path + f"-{i}"
+                if not os.path.exists(new_path):
+                    path = new_path
+                    break
                 i += 1
 
             log.info(f"Saving top {top_n} features to '{path}'...")
             top_n_features.to_csv(path, index=False, header=False)
-
+    else :
+        log.info(f"Saving top {top_n} features to '{path}'...")
+        ranked_features.head(top_n).index.to_series().to_csv(path, index=False, header=False)
     log.info("Feature selection finished.")
 
 
