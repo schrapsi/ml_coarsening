@@ -12,6 +12,7 @@ dependencies = [
     "lightning>=2.5.1.post0",
     "mlflow>=2.22.0",
     "pandas>=2.2.3",
+    "pandas-stubs~=2.2.3",
     "pytest>=8.4.1",
     "scikit-learn>=1.6.1",
     "seaborn>=0.13.2",

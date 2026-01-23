@@ -8,12 +8,11 @@ git checkout main
 git pull
 srun uv run -m src.train \
  trainer.enable_progress_bar=False \
- trainer=gpu \
+ trainer=cpu \
  model.net.hidden_sizes="[48, 32, 16]" \
  model.net.with_batch_norm=False \
  model.optimizer.weight_decay=0.00001 \
  data.features_file=/nfs/home/schrape/ml_coarsening/configs/data/features/top_32_features_of_cost_0_reduced_for_mss_1_20.txt \
- data.graphs_file=/nfs/home/schrape/ml_coarsening/configs/data/graphs/fold_7_train.txt \
+ data.graphs_file=/nfs/home/schrape/ml_coarsening/configs/data/graphs/all_69.txt \
  data.data_amount=1000000 \
- paths.log_dir=/nfs/work/students/ml_coarsening/logs/ \
- run_name=fold_7_model
+ paths.log_dir=/nfs/work/students/ml_coarsening/logs/
