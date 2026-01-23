@@ -2,5 +2,7 @@ _target_: src.data.graph_prediction_datamodule.GraphPredictionDataModule
 data_dir:
   - /nfs/work/graph_benchmark_sets/ml_coarsening/extended_set/
   - /nfs/work/graph_benchmark_sets/ml_coarsening/more_instances/
+  - /nfs/work/graph_benchmark_sets/ufm_paper/irregular/
+  - /nfs/work/graph_benchmark_sets/ufm_paper/regular/
 graphs_file: ${paths.root_dir}/configs/data/graphs/mss_1_20_eval.txt
 num_workers: 11

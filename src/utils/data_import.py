@@ -77,7 +77,6 @@ def feature_matrix_n(path, amount=None, with_id=False, balanced=False) -> DataFr
 def feature_matrix_n_performance(path, amount=None, with_id=False, balanced=False) -> DataFrame:
     print("Starting to Parse: ", path)
 
-    #TODO Change default back to freq_all.csv
     label_file = "freq_balanced.csv" if balanced else "freq_all.csv"
     # 1. Define datatypes for faster CSV reading
     node_dtypes = {'node_id': 'int32'}
