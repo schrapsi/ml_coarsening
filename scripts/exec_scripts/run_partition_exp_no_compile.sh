@@ -5,8 +5,8 @@ TODAY_DATE=$(date +"%Y-%-m-%-d")
 
 
 GRAPH_SET=all
-MODEL_DIR=2000-01-01_ml_clustering_heavy
-MODEL_BRANCH=ml-graph-stats
+MODEL_DIR=2000-01-01_shrink_factor_2_5
+MODEL_BRANCH=cheap-model-fix
 
 
 cd ~ || exit
@@ -18,21 +18,13 @@ git pull
 HYDRA_FULL_ERROR=1 srun uv run -m src.utils.direct_inference_setup \
   model_dir=$RUNS_DIR/$MODEL_DIR/ \
   data.graphs_file=$GRAPHS_DIR/$GRAPH_SET.txt \
+  flags="'--c-min-accepted-shrink-factor=2.5'"
 
 
 
 cd ~ || exit
-cd mt-kahypar/build/ || exit
+cd mt-kahypar/ || exit
 git checkout nikolai/$MODEL_BRANCH
-spack env activate kahypar
-cmake .. -DCMAKE_BUILD_TYPE=RELEASE
-make clean
-make MtKaHyPar -j
-spack env deactivate
-
-echo "===================="
-echo "building file done"
-echo "===================="
 
 EXP_JSON=$RUNS_DIR/$MODEL_DIR/experiment_sets/${GRAPH_SET}_experiment.json
 
