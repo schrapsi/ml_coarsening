@@ -20,8 +20,12 @@ def setup(cfg):
     exp_sets_dir = output_dir / graph_set_name
     exp_sets_dir.mkdir(exist_ok=True, parents=True)
 
+
     model_name = model_dir.name[11:]
-    file_path = "/nfs/home/schrape/ml_inside.json"
+    if cfg.base_json_file:
+        file_path = cfg.base_json_file
+    else:
+        file_path = "/nfs/home/schrape/ml_inside.json"
     with open(file_path, "r") as file:
         data = json.load(file)
 

@@ -12,6 +12,7 @@ defaults:
 task_name: "inference"
 model_dir: ${paths.root_dir}/logs/train/runs/2025-05-30_12-17-44/
 ckpt_path: ${model_dir}checkpoints/epoch_060.ckpt
+base_json_file: null
 model_class: "BinaryClassificationModule"
 flags: ""
 # Training-specific parameters
